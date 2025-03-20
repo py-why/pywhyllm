@@ -1,11 +1,7 @@
-from typing import List, Tuple, Dict
-from ..protocols import ModelerProtocol
-import networkx as nx
+from typing import List
 import guidance
-from enum import Enum
 import re
 import itertools
-import os
 from guidance import system, user, assistant, gen
 
 
@@ -24,9 +20,10 @@ class SimpleModelSuggester:
         Suggests the confounding factors that might influence the relationship between a treatment and an outcome, given a list of variables that have already been considered.
     """
 
-    def __init__(self, llm):
-        if (llm == 'gpt-4'):
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     # new ver
     def suggest_pairwise_relationship(self, variable1: str, variable2: str):
@@ -52,14 +49,8 @@ class SimpleModelSuggester:
         with assistant():
             lm += gen("description")
 
-        # with user():
-        #     lm += "Now what is your final answer: A, B, or C? Just give me a single letter."
-        #
-        # with assistant():
-        #     lm += gen("answer")
 
         description = lm['description']
-        print(description)
         answer = re.findall(r'<answer>(.*?)</answer>', description)
         answer = [ans.strip() for ans in answer]
         answer_str = "".join(answer)

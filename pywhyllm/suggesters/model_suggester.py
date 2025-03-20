@@ -1,16 +1,9 @@
 from typing import Set, Tuple, Dict, List
 from ..protocols import ModelerProtocol
-import networkx as nx
 import guidance
 from guidance import system, user, assistant, gen
-from ..helpers import RelationshipStrategy, ModelType
-import copy
-import random
-from enum import Enum
-from ..prompts import prompts as ps
-import os
+from ..helpers import RelationshipStrategy
 import re
-import csv
 
 
 class ModelSuggester(ModelerProtocol):

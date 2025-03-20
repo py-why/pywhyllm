@@ -1,11 +1,6 @@
-from typing import List, Tuple, Dict
-from ..protocols import ModelerProtocol
-import networkx as nx
 import guidance
 from guidance import system, user, assistant, gen
-from enum import Enum
 import re
-import itertools
 
 
 class SimpleIdentificationSuggester:

@@ -1,12 +1,9 @@
 import itertools
-from typing import List, Tuple, Dict, Set
+from typing import List, Tuple, Dict
 from ..protocols import IdentifierProtocol
-from ..helpers import RelationshipStrategy, ModelType
-from ..prompts import prompts as ps
-import networkx as nx
+from ..helpers import RelationshipStrategy
 import guidance
 from guidance import system, user, assistant, gen
-import copy
 import re
 
 

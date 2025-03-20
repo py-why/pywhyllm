@@ -1,4 +1,3 @@
-from typing import List
 import guidance
 import re
 from guidance import system, user, assistant, gen
