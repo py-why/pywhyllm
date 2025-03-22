@@ -28,6 +28,21 @@ TEST_VARIABLE_LISTS = {
                               ('air pollution exposure', 'lung cancer'): "The answer is <answer> B </answer>.",
                               ('air pollution exposure', 'exercise habits'): "The answer is <answer> B </answer>."
                               },
+    "list3": ["cigarette taxes", "rain", "car sales", "property taxes", "heart attacks"],
+    "list3_expected_ivs_result": ["cigarette taxes"],
+    "list4": ["Age", "Sex", "HbA1c", "HDL", "LDL", "eGFR", "Prior MI",
+              "Prior Stroke or TIA", "Prior Heart Failure", "Cardiovascular medication",
+              "T2DM medication", "Insulin", "Morbid obesity",
+              "First occurrence of Nonfatal myocardial infarction, nonfatal stroke, death from all cause",
+              "semaglutide treatment", "Semaglutide medication", "income", "musical taste"],
+    "list4_expected_backdoor_result": ["'Age'", "'Sex'", "'HbA1c'", "'HDL'", "'LDL'", "'eGFR'", "'Prior MI'",
+                                       "'Prior Stroke or TIA'", "'Prior Heart Failure'",
+                                       "'Cardiovascular medication'", "'T2DM medication'", "'Insulin'",
+                                       "'Morbid obesity'"],
+    "list4_expected_frontdoor_result": ["'HbA1c'", "'T2DM medication'", "'Insulin'", "'Cardiovascular medication'",
+                                        "'Prior MI'", "'Prior Stroke or TIA'", "'Prior Heart Failure'",
+                                        "'First occurrence of Nonfatal myocardial infarction, nonfatal stroke, death from all cause'"]
+
 }
 
 # TEST_PAIRS = {

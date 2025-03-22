@@ -5,9 +5,10 @@ import re
 
 class SimpleIdentificationSuggester:
 
-    def __init__(self, llm):
-        if (llm == 'gpt-4'):
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     def suggest_iv(self, factors, treatment, outcome):
         lm = self.llm
