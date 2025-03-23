@@ -7,13 +7,12 @@ import re
 
 
 class IdentificationSuggester(IdentifierProtocol):
-
     CONTEXT: str = """causal mechanisms"""
 
-    def __init__(self, llm):
-        if llm == 'gpt-4':
-            self.llm = guidance.models.OpenAI('gpt-4')
-            self.model_suggester = ModelSuggester('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     # def suggest_estimand(
     #     self,
@@ -131,7 +130,7 @@ class IdentificationSuggester(IdentifierProtocol):
         )
         return backdoor_set
 
-    #TODO:implement
+    # TODO:implement
     def suggest_frontdoor(
             self,
             treatment: str,
