@@ -2,8 +2,10 @@ from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.simple_identification_suggester import SimpleIdentificationSuggester
-from ...tests.model_suggester.example_variables import TEST_PAIRS as pairs
-from ...tests.model_suggester.example_variables import TEST_VARIABLE_LISTS as lists
+from ...tests.model_suggester.tests_input import TESTS_SIMPLE_IDENTIFICATION_SUGGESTER as inputs
+from ...tests.model_suggester.tests_expected_results import \
+    EXPECTED_RESULTS_SIMPLE_IDENTIFICATION_SUGGESTER as expected_results
+
 
 class TestSimpleIdentificationSuggester(object):
 
@@ -14,12 +16,10 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = lists["list3_expected_ivs_result"]
-        expected_result = [f"<iv>{var}</iv>" for var in expected_result]
-        expected_result = " ".join(expected_result)
+        expected_result = expected_results["test_var_list_expected_ivs"][0]
         mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_iv(lists["list3"], "smoking", "birth weight")
-        assert result == lists["list3_expected_ivs_result"]
+        result = modeler.suggest_iv(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
+        assert result == expected_results["test_var_list_expected_ivs"][1]
 
     def test_suggest_backdoor(self):
         modeler = SimpleIdentificationSuggester()
@@ -28,12 +28,10 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = lists["list4_expected_backdoor_result"]
-        expected_result = [f"<backdoor>{var}</backdoor>" for var in expected_result]
-        expected_result = " ".join(expected_result)
+        expected_result = expected_results["test_var_list_expected_backdoors"][0]
         mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_backdoor(lists["list4"], "semaglutide treatment", "cardiovascular health")
-        assert result == lists["list4_expected_backdoor_result"]
+        result = modeler.suggest_backdoor(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
+        assert result == expected_results["test_var_list_expected_backdoors"][1]
 
     def test_suggest_frontdoor(self):
         modeler = SimpleIdentificationSuggester()
@@ -42,9 +40,7 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = lists["list4_expected_frontdoor_result"]
-        expected_result = [f"<frontdoor>{var}</frontdoor>" for var in expected_result]
-        expected_result = " ".join(expected_result)
+        expected_result = expected_results["test_var_list_expected_frontdoors"][0]
         mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_frontdoor(lists["list4"], "semaglutide treatment", "cardiovascular health")
-        assert result == lists["list4_expected_frontdoor_result"]
+        result = modeler.suggest_frontdoor(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
+        assert result == expected_results["test_var_list_expected_frontdoors"][1]
