@@ -121,6 +121,7 @@ class SimpleModelSuggester:
             lm += gen("latents")
 
         latents = lm['latents']
+        print(latents.__class__.__name__)
         latents_list = re.findall(r'<conf>(.*?)</conf>', latents)
 
         return latents_list

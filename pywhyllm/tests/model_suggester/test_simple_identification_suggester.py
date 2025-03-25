@@ -2,10 +2,7 @@ from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.simple_identification_suggester import SimpleIdentificationSuggester
-from ...tests.model_suggester.tests_input import TESTS_SIMPLE_IDENTIFICATION_SUGGESTER as inputs
-from ...tests.model_suggester.tests_expected_results import \
-    EXPECTED_RESULTS_SIMPLE_IDENTIFICATION_SUGGESTER as expected_results
-
+from pywhyllm.tests.model_suggester.data_providers.simple_identification_suggester_data_provider import *
 
 class TestSimpleIdentificationSuggester(object):
 
@@ -16,10 +13,9 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = expected_results["test_var_list_expected_ivs"][0]
-        mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_iv(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
-        assert result == expected_results["test_var_list_expected_ivs"][1]
+        mock_llm.__getitem__ = MagicMock(return_value=test_iv_expected_response)
+        result = modeler.suggest_iv(test_vars[2:], test_vars[0], test_vars[1])
+        assert result == test_iv_expected_result
 
     def test_suggest_backdoor(self):
         modeler = SimpleIdentificationSuggester()
@@ -28,10 +24,9 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = expected_results["test_var_list_expected_backdoors"][0]
-        mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_backdoor(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
-        assert result == expected_results["test_var_list_expected_backdoors"][1]
+        mock_llm.__getitem__ = MagicMock(return_value=test_backdoor_expected_response)
+        result = modeler.suggest_backdoor(test_vars[2:], test_vars[0], test_vars[1])
+        assert result == test_backdoor_expected_result
 
     def test_suggest_frontdoor(self):
         modeler = SimpleIdentificationSuggester()
@@ -40,7 +35,6 @@ class TestSimpleIdentificationSuggester(object):
 
         mock_llm.__add__ = MagicMock(return_value=mock_llm)
 
-        expected_result = expected_results["test_var_list_expected_frontdoors"][0]
-        mock_llm.__getitem__ = MagicMock(return_value=expected_result)
-        result = modeler.suggest_frontdoor(inputs["test_var_list"][2:], inputs["test_var_list"][0], inputs["test_var_list"][1])
-        assert result == expected_results["test_var_list_expected_frontdoors"][1]
+        mock_llm.__getitem__ = MagicMock(return_value=test_frontdoor_expected_response)
+        result = modeler.suggest_frontdoor(test_vars[2:], test_vars[0], test_vars[1])
+        assert result == test_frontdoor_expected_result

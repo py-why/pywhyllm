@@ -7,18 +7,18 @@ import re
 
 
 class ModelSuggester(ModelerProtocol):
-
     CONTEXT: str = """causal mechanisms"""
 
-    def __init__(self, llm):
-        if llm == 'gpt-4':
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     def suggest_domain_expertises(
             self,
-            analysis_context,
             factors_list,
-            n_experts: int = 1
+            n_experts: int = 1,
+            analysis_context=CONTEXT
     ):
 
         expertise_list: List[str] = list()
@@ -519,7 +519,7 @@ class ModelSuggester(ModelerProtocol):
                 else:
                     suggested_parent = self.suggest_parents(
                         analysis_context=analysis_context,
-                        domain_expertise = expert_list[0],
+                        domain_expertise=expert_list[0],
                         factor=factor,
                         factors_list=factors_list,
                     )
