@@ -235,13 +235,13 @@ class ModelSuggester(ModelerProtocol):
 
                 output = lm["output"]
                 confounding_factors = re.findall(r"<confounding_factor>(.*?)</confounding_factor>", output)
-
+                print(confounding_factors)
                 if confounding_factors:
                     for factor in confounding_factors:
                         # to not add it twice into the list
                         if factor in factors_list and factor not in confounders:
                             confounders.append(factor)
-                    success = True
+                success = True
 
             except KeyError:
                 success = False

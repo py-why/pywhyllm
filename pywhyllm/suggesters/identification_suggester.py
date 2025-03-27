@@ -13,6 +13,7 @@ class IdentificationSuggester(IdentifierProtocol):
         if llm is not None:
             if (llm == 'gpt-4'):
                 self.llm = guidance.models.OpenAI('gpt-4')
+                self.model_suggester = ModelSuggester('gpt-4')
 
     # def suggest_estimand(
     #     self,
@@ -148,7 +149,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context: list() = CONTEXT,
+            analysis_context = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -167,43 +168,28 @@ class IdentificationSuggester(IdentifierProtocol):
             if factors_list[i] != treatment and factors_list[i] != outcome:
                 edited_factors_list.append(factors_list[i])
 
-        if len(expert_list) > 1:
-            for expert in expert_list:
-                mediators_edges, mediators_list = self.request_mediators(
-                    treatment=treatment,
-                    outcome=outcome,
-                    analysis_context=analysis_context,
-                    domain_expertise=expert,
-                    factors_list=edited_factors_list,
-                    mediators_edges=mediators_edges
-                )
-                for m in mediators_list:
-                    if m not in mediators:
-                        mediators.append(m)
-        else:
+        for expert in expert_list:
             mediators_edges, mediators_list = self.request_mediators(
                 treatment=treatment,
                 outcome=outcome,
-                analysis_context=analysis_context,
-                domain_expertise=expert_list[0],
+                domain_expertise=expert,
                 factors_list=edited_factors_list,
                 mediators_edges=mediators_edges,
+                analysis_context=analysis_context
             )
-
             for m in mediators_list:
                 if m not in mediators:
                     mediators.append(m)
-
         return mediators_edges, mediators
 
     def request_mediators(
             self,
             treatment,
             outcome,
-            analysis_context,
             domain_expertise,
             factors_list,
-            mediators_edges
+            mediators_edges,
+            analysis_context=CONTEXT
     ):
         mediators: List[str] = list()
 
@@ -245,15 +231,14 @@ class IdentificationSuggester(IdentifierProtocol):
 
                 mediating_factor = re.findall(
                     r"<mediating_factor>(.*?)</mediating_factor>", output)
+                print(mediating_factor)
 
                 if mediating_factor:
                     for factor in mediating_factor:
                         # to not add it twice into the list
                         if factor in factors_list and factor not in mediators:
                             mediators.append(factor)
-                    success = True
-                else:
-                    success = False
+                success = True
 
             except KeyError:
                 success = False
@@ -278,7 +263,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context: list() = CONTEXT,
+            analysis_context = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -297,25 +282,19 @@ class IdentificationSuggester(IdentifierProtocol):
             if factors_list[i] != treatment and factors_list[i] != outcome:
                 edited_factors_list.append(factors_list[i])
 
-        if len(expert_list) > 1:
-            for expert in expert_list:
-                self.request_ivs(
-                    treatment=treatment,
-                    outcome=outcome,
-                    analysis_context=analysis_context,
-                    domain_expertise=expert,
-                    factors_list=edited_factors_list,
-                    iv_edges=iv_edges,
-                )
-        else:
-            self.request_ivs(
+        for expert in expert_list:
+            iv_edges, iv_list = self.request_ivs(
                 treatment=treatment,
                 outcome=outcome,
                 analysis_context=analysis_context,
-                domain_expertise=expert_list[0],
+                domain_expertise=expert,
                 factors_list=edited_factors_list,
                 iv_edges=iv_edges,
             )
+
+            for m in iv_list:
+                if m not in ivs:
+                    ivs.append(m)
 
         return iv_edges, ivs
 
@@ -368,7 +347,7 @@ class IdentificationSuggester(IdentifierProtocol):
 
                 output = lm["output"]
                 iv_factors = re.findall(r"<iv_factor>(.*?)</iv_factor>", output)
-
+                print(iv_factors)
                 if iv_factors:
                     for factor in iv_factors:
                         if factor in factors_list and factor not in ivs:
@@ -387,4 +366,4 @@ class IdentificationSuggester(IdentifierProtocol):
                 else:
                     iv_edges[(element, treatment)] = 1
 
-        return iv_edges
+        return iv_edges, ivs
