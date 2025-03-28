@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
@@ -6,7 +7,7 @@ from pywhyllm.tests.model_suggester.data_providers.model_suggester_data_provider
 from pywhyllm.tests.model_suggester.data_providers.identification_suggester_data_provider import *
 from pywhyllm.tests.model_suggester.test_model_suggester import TestModelSuggester
 
-class TestIdentificationSuggester(object):
+class TestIdentificationSuggester(unittest.TestCase):
     def test_suggest_backdoor(self):
         return TestModelSuggester().test_suggest_confounders()
 

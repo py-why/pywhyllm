@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
@@ -6,7 +7,7 @@ from pywhyllm.tests.model_suggester.data_providers.model_suggester_data_provider
 from pywhyllm.helpers import RelationshipStrategy
 
 
-class TestModelSuggester(object):
+class TestModelSuggester(unittest.TestCase):
 
     def test_suggest_domain_expertises(self):
         modeler = ModelSuggester()

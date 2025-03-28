@@ -1,10 +1,11 @@
+import unittest
 from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.simple_identification_suggester import SimpleIdentificationSuggester
 from pywhyllm.tests.model_suggester.data_providers.simple_identification_suggester_data_provider import *
 
-class TestSimpleIdentificationSuggester(object):
+class TestSimpleIdentificationSuggester(unittest.TestCase):
 
     def test_suggest_iv(self):
         modeler = SimpleIdentificationSuggester()

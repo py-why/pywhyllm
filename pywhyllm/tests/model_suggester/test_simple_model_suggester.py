@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
@@ -5,7 +6,7 @@ from pywhyllm.suggesters.simple_model_suggester import SimpleModelSuggester
 from pywhyllm.tests.model_suggester.data_providers.simple_model_suggester_data_provider import *
 
 
-class TestSimpleModelSuggester(object):
+class TestSimpleModelSuggester(unittest.TestCase):
 
     def test_pairwise_relationship(self):
         # TODO: add support for a smaller model than gpt-4 that can be loaded locally.
