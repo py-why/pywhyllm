@@ -352,9 +352,7 @@ class IdentificationSuggester(IdentifierProtocol):
                     for factor in iv_factors:
                         if factor in factors_list and factor not in ivs:
                             ivs.append(factor)
-                    success = True
-                else:
-                    success = False
+                success = True
 
             except KeyError:
                 success = False
