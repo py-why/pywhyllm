@@ -13,6 +13,9 @@ advanced_notebooks = {
 }
 
 ignore_notebooks = [
+    # notebooks that require openai key to run
+    "examples.ipynb",
+    "walkthrough.ipynb"
 ]
 
 # Adding the root folder to the python path so that jupyter notebooks
