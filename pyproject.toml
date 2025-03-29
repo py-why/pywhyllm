@@ -59,7 +59,7 @@ poethepoet = "^0.33.0"
 flake8 = "^7.1.2"
 black = { version = "^25.1.0", extras = ["jupyter"] }
 isort = "^6.0.1"
-pytest = "^8.3.5"
+pytest = "^7.4.3"
 pytest-cov = "^6.0.0"
 pytest-split = "^0.10.0"
 nbformat = "^5.10.4"
