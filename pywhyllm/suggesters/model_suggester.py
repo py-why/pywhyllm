@@ -1,31 +1,25 @@
+import itertools
 from typing import Set, Tuple, Dict, List
 from ..protocols import ModelerProtocol
-import networkx as nx
 import guidance
 from guidance import system, user, assistant, gen
-from ..helpers import RelationshipStrategy, ModelType
-import copy
-import random
-from enum import Enum
-from ..prompts import prompts as ps
-import os
+from ..helpers import RelationshipStrategy
 import re
-import csv
 
 
 class ModelSuggester(ModelerProtocol):
-
     CONTEXT: str = """causal mechanisms"""
 
-    def __init__(self, llm):
-        if llm == 'gpt-4':
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     def suggest_domain_expertises(
             self,
-            analysis_context,
             factors_list,
-            n_experts: int = 1
+            n_experts: int = 1,
+            analysis_context=CONTEXT
     ):
 
         expertise_list: List[str] = list()
@@ -66,9 +60,9 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_domain_experts(
             self,
-            analysis_context,
             factors_list,
-            n_experts: int = 5
+            n_experts: int = 5,
+            analysis_context=CONTEXT
     ):
 
         experts_list: Set[str] = set()
@@ -155,10 +149,10 @@ class ModelSuggester(ModelerProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
-            expertise_list: list(),
+            factors_list: list,
+            expertise_list: list,
             analysis_context: str = CONTEXT,
-            stakeholders: list() = None
+            stakeholders: list = None
     ):
         expert_list: List[str] = list()
         for elements in expertise_list:
@@ -177,26 +171,12 @@ class ModelSuggester(ModelerProtocol):
             if factors_list[i] != treatment and factors_list[i] != outcome:
                 edited_factors_list.append(factors_list[i])
 
-        if len(expertise_list) > 1:
-            for expert in expertise_list:
-                confounders_edges, confounders_list = self.request_confounders(
-                    treatment=treatment,
-                    outcome=outcome,
-                    analysis_context=analysis_context,
-                    domain_expertise=expert,
-                    factors_list=edited_factors_list,
-                    confounders_edges=confounders_edges
-                )
-
-                for m in confounders_list:
-                    if m not in confounders:
-                        confounders.append(m)
-        else:
+        for expert in expertise_list:
             confounders_edges, confounders_list = self.request_confounders(
                 treatment=treatment,
                 outcome=outcome,
                 analysis_context=analysis_context,
-                domain_expertise=expertise_list[0],
+                domain_expertise=expert,
                 factors_list=edited_factors_list,
                 confounders_edges=confounders_edges
             )
@@ -211,10 +191,10 @@ class ModelSuggester(ModelerProtocol):
             self,
             treatment,
             outcome,
-            analysis_context,
             domain_expertise,
             factors_list,
-            confounders_edges
+            confounders_edges,
+            analysis_context=CONTEXT
     ):
         confounders: List[str] = list()
 
@@ -261,9 +241,7 @@ class ModelSuggester(ModelerProtocol):
                         # to not add it twice into the list
                         if factor in factors_list and factor not in confounders:
                             confounders.append(factor)
-                    success = True
-                else:
-                    success = False
+                success = True
 
             except KeyError:
                 success = False
@@ -284,10 +262,10 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_parents(
             self,
-            analysis_context,
             domain_expertise,
             factor,
-            factors_list
+            factors_list,
+            analysis_context=CONTEXT
     ):
         parent_candidates: List[str] = []
 
@@ -335,14 +313,11 @@ class ModelSuggester(ModelerProtocol):
                 output = lm["output"]
 
                 influencing_factors = re.findall(r"<influencing_factor>(.*?)</influencing_factor", output)
-
                 if influencing_factors:
                     for influencing_factor in influencing_factors:
                         if influencing_factor in parent_candidates and influencing_factor not in parents:
                             parents.append(influencing_factor)
-                    success = True
-                else:
-                    success = False
+                success = True
 
             except KeyError:
                 success = False
@@ -352,10 +327,10 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_children(
             self,
-            analysis_context,
             domain_expertise,
             factor,
-            factors_list
+            factors_list,
+            analysis_context=CONTEXT
     ):
 
         children_candidates: List[str] = []
@@ -409,14 +384,11 @@ class ModelSuggester(ModelerProtocol):
                 output = lm["output"]
 
                 influenced_factors = re.findall(r"<influenced_factor>(.*?)</influenced_factor", output)
-
                 if influenced_factors:
                     for influenced_factor in influenced_factors:
                         if influenced_factor in children_candidates and influenced_factor not in children:
                             children.append(influenced_factor)
-                    success = True
-                else:
-                    success = False
+                success = True
 
             except KeyError:
                 success = False
@@ -464,7 +436,6 @@ class ModelSuggester(ModelerProtocol):
                 output = lm["output"]
 
                 answer = re.findall(r"<answer>(.*?)</answer", output)
-
                 if answer:
                     if answer[0] == "A" or answer[0] == "(A)":
                         return factor_a, factor_b
@@ -488,13 +459,13 @@ class ModelSuggester(ModelerProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
-            expertise_list: list(),
+            factors_list: list,
+            expertise_list: list,
+            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Parent,
             analysis_context: str = CONTEXT,
-            stakeholders: list() = None,
-            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Parent
+            stakeholders: list = None,
     ):
-        expert_list: List[str] = list()
+        expert_list: List[str] = []
         for elements in expertise_list:
             expert_list.append(elements)
         if stakeholders is not None:
@@ -503,36 +474,20 @@ class ModelSuggester(ModelerProtocol):
 
         if relationship_strategy == RelationshipStrategy.Parent:
             "loop asking parents program"
-
             parent_edges: Dict[Tuple[str, str], int] = dict()
-
             for factor in factors_list:
-                if len(expert_list) > 1:
-                    for expert in expert_list:
-                        suggested_parent = self.suggest_parents(
-                            analysis_context=analysis_context,
-                            domain_expertise=expert,
-                            factor=factor,
-                            factors_list=factors_list
-                        )
-                        for element in suggested_parent:
-                            if (
-                                    element,
-                                    factor,
-                            ) in parent_edges and element in factors_list:
-                                parent_edges[(element, factor)] += 1
-                            else:
-                                parent_edges[(element, factor)] = 1
-                else:
+                for expert in expert_list:
                     suggested_parent = self.suggest_parents(
-                        analysis_context=analysis_context,
-                        domain_expertise = expert_list[0],
+                        domain_expertise=expert,
                         factor=factor,
                         factors_list=factors_list,
+                        analysis_context=analysis_context
                     )
-
                     for element in suggested_parent:
-                        if (element, factor) in parent_edges:
+                        if (
+                                element,
+                                factor,
+                        ) in parent_edges and element in factors_list:
                             parent_edges[(element, factor)] += 1
                         else:
                             parent_edges[(element, factor)] = 1
@@ -545,32 +500,18 @@ class ModelSuggester(ModelerProtocol):
             children_edges: Dict[Tuple[str, str], int] = dict()
 
             for factor in factors_list:
-                if len(expert_list) > 1:
-                    for expert in expert_list:
-                        suggested_children = self.suggest_children(
-                            analysis_context=analysis_context,
-                            domain_expertise=expert,
-                            factor=factor,
-                            factors_list=factors_list
-                        )
-                        for element in suggested_children:
-                            if (
-                                    element,
-                                    factor,
-                            ) in children_edges and element in factors_list:
-                                children_edges[(element, factor)] += 1
-                            else:
-                                children_edges[(element, factor)] = 1
-                else:
-                    suggested_children = self.suggest_parents(
-                        analysis_context=analysis_context,
-                        domain_expertise=expert_list[0],
+                for expert in expert_list:
+                    suggested_children = self.suggest_children(
+                        domain_expertise=expert,
                         factor=factor,
-                        factors_list=factors_list
+                        factors_list=factors_list,
+                        analysis_context=analysis_context
                     )
-
                     for element in suggested_children:
-                        if (element, factor) in children_edges:
+                        if (
+                                element,
+                                factor,
+                        ) in children_edges and element in factors_list:
                             children_edges[(element, factor)] += 1
                         else:
                             children_edges[(element, factor)] = 1
@@ -582,36 +523,20 @@ class ModelSuggester(ModelerProtocol):
 
             pairwise_edges: Dict[Tuple[str, str], int] = dict()
 
-            for factor_a in factors_list:
-                for factor_b in factors_list:
-                    if factor_a != factor_b:
-                        if len(expert_list) > 1:
-                            for expert in expert_list:
-                                suggested_edge = self.suggest_pairwise_relationship(
-                                    domain_expertise=expert,
-                                    analysis_context=analysis_context,
-                                    factor_a=factor_a,
-                                    factor_b=factor_b
-                                )
+            for (factor_a, factor_b) in itertools.combinations(factors_list, 2):
+                for expert in expert_list:
+                    suggested_edge = self.suggest_pairwise_relationship(
+                        domain_expertise=expert,
+                        factor_a=factor_a,
+                        factor_b=factor_b,
+                        analysis_context=analysis_context
+                    )
 
-                                if suggested_edge is not None:
-                                    if suggested_edge in pairwise_edges:
-                                        pairwise_edges[suggested_edge] += 1
-                                    else:
-                                        pairwise_edges[suggested_edge] = 1
+                    if suggested_edge is not None:
+                        if suggested_edge in pairwise_edges:
+                            pairwise_edges[suggested_edge] += 1
                         else:
-                            suggested_edge = self.suggest_pairwise_relationship(
-                                domain_expertise=expert_list[0],
-                                analysis_context=analysis_context,
-                                factor_a=factor_a,
-                                factor_b=factor_b
-                            )
-
-                            if suggested_edge is not None:
-                                if suggested_edge in pairwise_edges:
-                                    pairwise_edges[suggested_edge] += 1
-                                else:
-                                    pairwise_edges[suggested_edge] = 1
+                            pairwise_edges[suggested_edge] = 1
 
             return pairwise_edges
 
@@ -619,11 +544,11 @@ class ModelSuggester(ModelerProtocol):
             "one call to confounder program"
 
             confounders_counter, confounders = self.suggest_confounders(
-                analysis_context=analysis_context,
                 treatment=treatment,
                 outcome=outcome,
                 factors_list=factors_list,
                 expertise_list=expertise_list,
+                analysis_context=analysis_context
             )
 
             return confounders_counter, confounders

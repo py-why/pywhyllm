@@ -1,11 +1,7 @@
-from typing import List, Tuple, Dict
-from ..protocols import ModelerProtocol
-import networkx as nx
+from typing import List
 import guidance
-from enum import Enum
 import re
 import itertools
-import os
 from guidance import system, user, assistant, gen
 
 
@@ -13,20 +9,21 @@ class SimpleModelSuggester:
     """
     A class that provides methods for suggesting causal relationships and confounding factors between variables.
 
-    This class uses the guidance library to interact with LLMs, and assumes that guidance.llm has already been initialized to the user's preferred LLM 
+    This class uses the guidance library to interact with LLMs, and assumes that guidance.llm has already been initialized to the user's preferred LLM
 
     Methods:
-    - suggest_pairwise_relationship(variable1: str, variable2: str) -> List[str]: 
+    - suggest_pairwise_relationship(variable1: str, variable2: str) -> List[str]:
         Suggests the causal relationship between two variables and returns a list containing the cause, effect, and a description of the relationship.
-    - suggest_relationships(variables: List[str]) -> Dict[Tuple[str, str], str]: 
+    - suggest_relationships(variables: List[str]) -> Dict[Tuple[str, str], str]:
         Suggests the causal relationships between all pairs of variables in a list and returns a dictionary containing the cause-effect pairs and their descriptions.
-    - suggest_confounders(variables: List[str], treatment: str, outcome: str) -> List[str]: 
+    - suggest_confounders(variables: List[str], treatment: str, outcome: str) -> List[str]:
         Suggests the confounding factors that might influence the relationship between a treatment and an outcome, given a list of variables that have already been considered.
     """
 
-    def __init__(self, llm):
-        if (llm == 'gpt-4'):
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     # new ver
     def suggest_pairwise_relationship(self, variable1: str, variable2: str):
@@ -52,14 +49,7 @@ class SimpleModelSuggester:
         with assistant():
             lm += gen("description")
 
-        # with user():
-        #     lm += "Now what is your final answer: A, B, or C? Just give me a single letter."
-        #
-        # with assistant():
-        #     lm += gen("answer")
-
         description = lm['description']
-        print(description)
         answer = re.findall(r'<answer>(.*?)</answer>', description)
         answer = [ans.strip() for ans in answer]
         answer_str = "".join(answer)
@@ -100,7 +90,7 @@ class SimpleModelSuggester:
         return relationships
 
     # new ver
-    def suggest_confounders(self, variables: list[str], treatment: str, outcome: str) -> list[str]:
+    def suggest_confounders(self, variables: List[str], treatment: str, outcome: str) -> List[str]:
 
         """
             Suggests potential confounding factors that might influence the relationship between the treatment and outcome variables.

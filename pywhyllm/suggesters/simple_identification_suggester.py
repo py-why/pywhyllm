@@ -1,18 +1,14 @@
-from typing import List, Tuple, Dict
-from ..protocols import ModelerProtocol
-import networkx as nx
 import guidance
 from guidance import system, user, assistant, gen
-from enum import Enum
 import re
-import itertools
 
 
 class SimpleIdentificationSuggester:
 
-    def __init__(self, llm):
-        if (llm == 'gpt-4'):
-            self.llm = guidance.models.OpenAI('gpt-4')
+    def __init__(self, llm=None):
+        if llm is not None:
+            if (llm == 'gpt-4'):
+                self.llm = guidance.models.OpenAI('gpt-4')
 
     def suggest_iv(self, factors, treatment, outcome):
         lm = self.llm
@@ -66,4 +62,3 @@ class SimpleIdentificationSuggester:
         frontdoors_list = re.findall(r'<frontdoor>(.*?)</frontdoor>', frontdoors)
 
         return frontdoors_list
-
