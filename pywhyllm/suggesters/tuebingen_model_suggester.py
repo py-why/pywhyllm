@@ -17,7 +17,7 @@ class Strategy(Enum):
 
 
 class TuebingenModelSuggester(ModelSuggester):
-    def __init__(self, llm):
+    def __init__(self, llm=None):
         super().__init__(llm)
 
     def suggest_description(
