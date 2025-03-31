@@ -65,7 +65,7 @@ class ValidationSuggester(IdentifierProtocol):
             factors_list: list(),
             negative_controls_counter: list(),
             domain_expertise: str,
-            analysis_context = CONTEXT
+            analysis_context=CONTEXT
     ):
         negative_controls_list: List[str] = list()
 
@@ -82,8 +82,7 @@ class ValidationSuggester(IdentifierProtocol):
             questions about cause and effect using your domain knowledge in the {domain_expertise}."""
 
                 with user():
-                    lm += f"""factor_names: {factors_list} From your
-                             perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
+                    lm += f"""factor_names: {factors_list} From your perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
                              the {analysis_context}, should see zero treatment effect when changing the {treatment}? Which factor(s) 
                              from the list of factors, if any at all, relevant to the {analysis_context}, are negative controls on the 
                              causal mechanisms that affect the {outcome} when changing {treatment}? Using your domain knowledge, 
@@ -176,14 +175,12 @@ class ValidationSuggester(IdentifierProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in the {domain_expertise} and are 
-                                studying the {analysis_context}. You are using your knowledge to help build a causal model that contains 
+                    lm += f"""You are an expert in the {domain_expertise} and are studying the {analysis_context}. You are using your knowledge to help build a causal model that contains 
                                 all the assumptions about the {domain_expertise}. Where a causal model is a conceptual model that describes 
                                 the causal mechanisms of a system. You will do this by by answering questions about cause and effect and 
                                 using your domain knowledge in the {domain_expertise}."""
                 with user():
-                    lm += f"""(1) From your perspective as 
-                                 an expert in the {domain_expertise}, think step by step as you consider the factors that may interact 
+                    lm += f"""(1) From your perspective as an expert in the {domain_expertise}, think step by step as you consider the factors that may interact 
                                  between the {treatment} and the {outcome}. Use your knowledge as an expert in the {domain_expertise} to 
                                  describe the confounders, if there are any at all, between the {treatment} and the {outcome}. Be concise 
                                  and keep your thinking within two paragraphs. Then provide your step by step chain of thoughts within the 
