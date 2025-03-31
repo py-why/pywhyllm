@@ -114,13 +114,13 @@ class TestValidationSuggester(unittest.TestCase):
                                         domain_expertises, RelationshipStrategy.Parent)
 
         assert result == test_critique_graph_parent_expected_results
-
+        # child
         mock_llm.__getitem__ = MagicMock(side_effect=test_critique_graph_children_expected_response)
         result = modeler.critique_graph(test_vars, test_suggest_relationships_child_expected_results,
                                         domain_expertises, RelationshipStrategy.Child)
 
         assert result == test_critique_graph_children_expected_results
-
+        # pairwise
         mock_llm.__getitem__ = MagicMock(side_effect=test_critique_graph_pairwise_expected_response)
         result = modeler.critique_graph(test_vars, test_suggest_relationships_pairwise_expected_results,
                                         domain_expertises, RelationshipStrategy.Pairwise)
