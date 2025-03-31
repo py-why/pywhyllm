@@ -10,7 +10,20 @@ from pywhyllm.helpers import RelationshipStrategy
 
 
 class TestValidationSuggester(unittest.TestCase):
-    def test_request_latent_confounders_expected_response(self):
+    def test_suggest_latent_confounders(self):
+        modeler = ValidationSuggester()
+        mock_llm = MagicMock(spec=OpenAI)
+        modeler.llm = mock_llm
+
+        mock_llm.__add__ = MagicMock(return_value=mock_llm)
+
+        mock_llm.__getitem__ = MagicMock(return_value=test_latent_confounders_expected_response)
+
+        result = modeler.suggest_latent_confounders(test_vars[0], test_vars[1], domain_expertises)
+
+        assert result == test_suggest_latent_confounders_expected_results
+
+    def test_request_latent_confounders(self):
         modeler = ValidationSuggester()
         mock_llm = MagicMock(spec=OpenAI)
         modeler.llm = mock_llm
@@ -23,9 +36,22 @@ class TestValidationSuggester(unittest.TestCase):
         result = modeler.request_latent_confounders(test_vars[0], test_vars[1], latent_confounders_counter,
                                                     domain_expertises[0])
 
-        assert result == test_latent_confounders_expected_results
+        assert result == test_request_latent_confounders_expected_results
 
-    def test_request_negative_controls_expected_response(self):
+    def test_suggest_negative_controls(self):
+        modeler = ValidationSuggester()
+        mock_llm = MagicMock(spec=OpenAI)
+        modeler.llm = mock_llm
+
+        mock_llm.__add__ = MagicMock(return_value=mock_llm)
+
+        mock_llm.__getitem__ = MagicMock(return_value=test_negative_controls_expected_response)
+
+        result = modeler.suggest_negative_controls(test_vars[0], test_vars[1], test_vars, domain_expertises)
+
+        assert result == test_suggest_negative_controls_expected_results
+
+    def test_request_negative_controls(self):
         modeler = ValidationSuggester()
         mock_llm = MagicMock(spec=OpenAI)
         modeler.llm = mock_llm
@@ -38,9 +64,9 @@ class TestValidationSuggester(unittest.TestCase):
         result = modeler.request_negative_controls(test_vars[0], test_vars[1], test_vars, negative_controls_counter,
                                                    domain_expertises[0])
 
-        assert result == test_negative_controls_expected_results
+        assert result == test_request_negative_controls_expected_results
 
-    def test_request_parent_critique_expected_response(self):
+    def test_request_parent_critique(self):
         modeler = ValidationSuggester()
         mock_llm = MagicMock(spec=OpenAI)
         modeler.llm = mock_llm
@@ -53,7 +79,7 @@ class TestValidationSuggester(unittest.TestCase):
 
         assert result == test_parent_critique_expected_results
 
-    def test_request_children_critique_expected_response(self):
+    def test_request_children_critique(self):
         modeler = ValidationSuggester()
         mock_llm = MagicMock(spec=OpenAI)
         modeler.llm = mock_llm
@@ -66,7 +92,7 @@ class TestValidationSuggester(unittest.TestCase):
 
         assert result == test_children_critique_expected_results
 
-    def test_pairwise_critique_expected_response(self):
+    def test_request_pairwise_critique(self):
         modeler = ValidationSuggester()
         mock_llm = MagicMock(spec=OpenAI)
         modeler.llm = mock_llm

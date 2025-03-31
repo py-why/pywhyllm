@@ -21,7 +21,7 @@ class TuebingenModelSuggester(ModelSuggester):
         super().__init__(llm)
 
     def suggest_description(
-            self, variable, context=None, ask_reference=False
+            self, variable, ask_reference=False
     ):
         generate_description = self._build_description_program(variable)
 
@@ -255,11 +255,11 @@ class TuebingenModelSuggester(ModelSuggester):
                         the answer within the tags, <answer>Yes/No</answer>, and the most influential reference within 
                         the tags <reference>Author, Title, Year of publication</reference>.
                         \n\n\n----------------\n\n\n<answer>Yes</answer>\n<reference>Author, Title, Year of 
-                        publication</reference>\n\n\n----------------\n\n\n<answer>No</answer> {{~/user}}"""
+                        publication</reference>\n\n\n----------------\n\n\n<answer>No</answer>"""
                 else:
                     query["user"] += """When consensus is reached, thinking carefully and factually, explain the council's answer. 
                     Provide the answer within the tags, <answer>Yes/No</answer>.
-                        \n\n\n----------------\n\n\n<answer>Yes</answer>\n\n\n----------------\n\n\n<answer>No</answer> {{~/user}}"""
+                        \n\n\n----------------\n\n\n<answer>Yes</answer>\n\n\n----------------\n\n\n<answer>No</answer>"""
 
             elif use_strategy == Strategy.CoT:
                 if use_description:

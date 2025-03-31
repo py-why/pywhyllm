@@ -65,7 +65,7 @@ class ValidationSuggester(IdentifierProtocol):
             factors_list: list(),
             negative_controls_counter: list(),
             domain_expertise: str,
-            analysis_context: list = CONTEXT
+            analysis_context = CONTEXT
     ):
         negative_controls_list: List[str] = list()
 

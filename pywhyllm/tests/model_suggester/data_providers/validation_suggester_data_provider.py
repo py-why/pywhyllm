@@ -20,9 +20,14 @@ test_critique_graph_pairwise_expected_response = ["<answer>A</answer>", "<answer
                                                   "<answer>B</answer>", "<answer>B</answer>", "<answer>B</answer>"]
 
 # ASSERTIONS
-test_latent_confounders_expected_results = ({'mental health': 1, 'socio-economic status': 1},
-                                            ['socio-economic status', 'mental health'])
-test_negative_controls_expected_results = ({'exercise habits': 1}, ['exercise habits'])
+test_suggest_latent_confounders_expected_results = ({'mental health': 1, 'socio-economic status': 1},
+                                                    [{'mental health': 1, 'socio-economic status': 1},
+                                                     ['socio-economic status', 'mental health']])
+test_request_latent_confounders_expected_results = ({'mental health': 1, 'socio-economic status': 1},
+                                                    ['socio-economic status', 'mental health'])
+test_suggest_negative_controls_expected_results = (
+{'exercise habits': 1}, [{'exercise habits': 1}, ['exercise habits']])
+test_request_negative_controls_expected_results = ({'exercise habits': 1}, ['exercise habits'])
 test_parent_critique_expected_results = []
 test_children_critique_expected_results = ['lung cancer']
 test_pairwise_critique_expected_results = ('smoking', 'lung cancer')
