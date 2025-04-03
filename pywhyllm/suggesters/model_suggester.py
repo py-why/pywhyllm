@@ -461,7 +461,7 @@ class ModelSuggester(ModelerProtocol):
             outcome: str,
             factors_list: list,
             expertise_list: list,
-            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Parent,
+            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Pairwise,
             analysis_context: str = CONTEXT,
             stakeholders: list = None,
     ):

@@ -381,7 +381,7 @@ class ValidationSuggester(IdentifierProtocol):
             factors_list: List[str],
             edges: Dict[Tuple[str, str], int],
             experts: list(),
-            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Parent,
+            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Pairwise,
             analysis_context: str = CONTEXT,
             stakeholders: list() = None,
     ):
