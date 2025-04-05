@@ -53,6 +53,8 @@ python = ">=3.9,<3.13"
 # to support python 3.9 with networkx
 networkx = "<=3.2.1"
 guidance = ">=0.2"
+openai = ">=1.70"
+pydantic = ">=2.11"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.33.0"
