@@ -234,15 +234,17 @@ class TuebingenModelSuggester(ModelSuggester):
         query = {}
 
         if use_domain is not None:
-            query["system"] = f"""You are a helpful assistant on causal reasoning and {use_domain}. Your goal is to answer 
+            sys_prompt = f"""You are a helpful assistant on causal reasoning and {use_domain}. Your goal is to answer 
             questions about cause and effect in a factual and concise way."""
+            query["system"] = cleandoc(sys_prompt)
         else:
-            query["system"] = f"""You are a helpful assistant on causal reasoning. Your goal is to answer questions 
+            sys_prompt = f"""You are a helpful assistant on causal reasoning. Your goal is to answer questions 
             about cause and effect in a factual and concise way."""
+            query["system"] = cleandoc(sys_prompt)
 
         if use_strategy is not None:
             if use_strategy == Strategy.ToT_Single:
-                query["user"] = f"""There is a council of three different experts answering this question.
+                user_prompt = f"""There is a council of three different experts answering this question.
                     Each of the three expert will write down 1 step of their thinking, and share it with the council. 
                     Then all experts will go on to the next step, etc.
                     All experts in the council are arguing to arrive to a true and factual answer. Their goal is to arrive 
@@ -251,36 +253,43 @@ class TuebingenModelSuggester(ModelSuggester):
                     If any expert realises their argument is wrong at any point, then they will adjust their argument to 
                     be factual and logical.
                     The question is """
+                query["user"] = cleandoc(user_prompt)
 
                 if use_description:
-                    query["user"] = f"""can changing {variable_a}, where {description_a}, change {variable_b}, where 
+                    user_prompt = f"""can changing {variable_a}, where {description_a}, change {variable_b}, where 
     {description_b}? Answer Yes or No."""
+                    query["user"] += cleandoc(user_prompt)
                 else:
-                    query["user"] = f"""can changing {variable_a} change {variable_b}? Answer Yes or No."""
+                    user_prompt = f"""can changing {variable_a} change {variable_b}? Answer Yes or No."""
+                    query["user"] += cleandoc(user_prompt)
 
                 if ask_reference:
-                    query["user"] += f"""At each step, each expert include a reference to a research paper that supports 
-                    their argument. They will provide a one sentence summary of the paper and how it supports their argument. 
+                    user_prompt = f"""At each step, each expert include a reference to a research paper that supports 
+                        their argument. They will provide a one sentence summary of the paper and how it supports their argument. 
                         Then they will answer whether a change in {variable_a} changes {variable_b}. Answer Yes or No.
                         When consensus is reached, thinking carefully and factually, explain the council's answer. Provide 
                         the answer within the tags, <answer>Yes/No</answer>, and the most influential reference within 
                         the tags <reference>Author, Title, Year of publication</reference>.
                         \n\n\n----------------\n\n\n<answer>Yes</answer>\n<reference>Author, Title, Year of 
                         publication</reference>\n\n\n----------------\n\n\n<answer>No</answer>"""
+                    query["user"] += cleandoc(user_prompt)
                 else:
-                    query["user"] += """When consensus is reached, thinking carefully and factually, explain the council's answer. 
+                    user_prompt = """When consensus is reached, thinking carefully and factually, explain the council's answer. 
                     Provide the answer within the tags, <answer>Yes/No</answer>.
                         \n\n\n----------------\n\n\n<answer>Yes</answer>\n\n\n----------------\n\n\n<answer>No</answer>"""
+                    query["user"] += cleandoc(user_prompt)
 
             elif use_strategy == Strategy.CoT:
                 if use_description:
-                    query["user"] = f"""Can changing {variable_a}, where {description_a}, change {variable_b}, where 
-                    {description_b}? """
+                    user_prompt = f"""Can changing {variable_a}, where {description_a}, change {variable_b}, where 
+                    {description_b}?"""
+                    query["user"] = cleandoc(user_prompt)
                 else:
-                    query["user"] = f"""Can changing {variable_a} change {variable_b}?"""
+                    user_prompt = f"""Can changing {variable_a} change {variable_b}?"""
+                    query["user"] = cleandoc(user_prompt)
 
                 if ask_reference:
-                    query["user"] += f"""What are three research papers that discuss each of these variables? What do they 
+                    user_prompt = f"""What are three research papers that discuss each of these variables? What do they 
                     say about the relationship they may or may not have? You are to provide the paper title and a one 
                     sentence summary each paper's argument. Then use those arguments as reference to answer whether a change 
                     in {variable_a} changes {variable_b}. Answer Yes or No.
@@ -289,33 +298,36 @@ class TuebingenModelSuggester(ModelSuggester):
                         <reference>Author, Title, Year of publication</reference>. 
                         \n\n\n----------------\n\n\n<answer>Yes</answer>\n<reference>Author, Title, 
                         Year of publication</reference>\n\n\n----------------\n\n\n<answer>No</answer> {{~/user}}"""
+                    query["user"] += cleandoc(user_prompt)
                 else:
-                    query["user"] += f"""Answer Yes or No. Within one sentence, you are to think step-by-step to make sure 
+                    user_prompt = f"""Answer Yes or No. Within one sentence, you are to think step-by-step to make sure 
                     that you have the right answer. Then provide your final answer within the tags, <answer>Yes/No</answer.
                         \n\n\n----------------\n\n\n<answer>Yes</answer>\n\n\n----------------\n\n\n<answer>No</answer>"""
+                    query["user"] += cleandoc(user_prompt)
 
             elif use_strategy == Strategy.Straight:
                 if use_description:
-                    query[
-                        "user"] = f"""Can changing {variable_a}, where {description_a}, change {variable_b}, where {description_b}? """
+                    user_prompt = f"""Can changing {variable_a}, where {description_a}, change {variable_b}, where {description_b}? """
+                    query["user"] = cleandoc(user_prompt)
                 else:
-                    query["user"] = f"""Can changing {variable_a} change {variable_b}?"""
+                    user_prompt = f"""Can changing {variable_a} change {variable_b}?"""
+                    query["user"] = cleandoc(user_prompt)
 
                 if ask_reference:
-                    query["user"] += f"""What are three research papers that discuss each of these variables? What do they 
+                    user_prompt = f"""What are three research papers that discuss each of these variables? What do they 
                     say about the relationship they may or may not have? You are to provide the paper title and a one 
                     sentence summary each paper's argument. Then use those arguments as reference to answer whether a 
                     change in {variable_a} changes {variable_b}. Answer Yes or No.
-                        Within one sentence, you are to think step-by-step to make sure that you have the right answer. 
-                        Provide your final answer within the tags, <answer>Yes/No</answer>, and your references within 
-                        the tags <reference>Author, Title, Year of publication</reference. 
-                        \n\n\n----------------\n\n\n<answer>Yes</answer>\n<reference>Author, Title, Year of publication</reference>\n\n\n----------------\n\n\n<answer>No</answer>"""
+                    Within one sentence, you are to think step-by-step to make sure that you have the right answer. 
+                    Provide your final answer within the tags, <answer>Yes/No</answer>, and your references within 
+                    the tags <reference>Author, Title, Year of publication</reference. 
+                    \n\n\n----------------\n\n\n<answer>Yes</answer>\n<reference>Author, Title, Year of publication</reference>\n\n\n----------------\n\n\n<answer>No</answer>"""
+                    query["user"] += cleandoc(user_prompt)
 
                 else:
-                    query["user"] += f"""Answer Yes or No. Within one sentence, you are to think step-by-step to make sure 
+                    user_prompt = f"""Answer Yes or No. Within one sentence, you are to think step-by-step to make sure 
                     that you have the right answer. Then provide your final answer within the tags, <answer>Yes/No</answer>.
                         \n\n\n----------------\n\n\nExample of output structure: <answer>Yes</answer>\n\n\n----------------\n\n\nExample of output structure: <answer>No</answer>"""
-        query["user"] = cleandoc(query["user"])
-        query["system"] = cleandoc(query["system"])
+                    query["user"] += cleandoc(user_prompt)
 
         return query

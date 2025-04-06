@@ -48,7 +48,6 @@ class TestTuebingenModelSuggester(unittest.TestCase):
         assert result == test__build_description_program_with_context_no_reference_expected_result
         #Test with context, with reference
         result = modeler._build_description_program(variable, True, True)
-        print(result)
         assert result == test__build_description_program_with_context_with_reference_expected_result
 
     def test_suggest_relationship(self):
