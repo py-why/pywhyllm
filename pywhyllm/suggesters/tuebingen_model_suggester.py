@@ -2,7 +2,7 @@ from typing import List
 import guidance
 import re
 from guidance import system, user, assistant, gen
-
+from inspect import cleandoc
 import sys
 from enum import Enum
 
@@ -75,15 +75,17 @@ class TuebingenModelSuggester(ModelSuggester):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are a helpful assistant on causal reasoning. Your goal is to answer questions about 
+                    prompt_str = f"""You are a helpful assistant on causal reasoning. Your goal is to answer questions about 
                     cause and effect in a factual and concise way."""
+                    lm += cleandoc(prompt_str)
                 with user():
-                    lm += f"""Can changing {variable_a}, {description_a}, change {variable_b}, {description_b}?
+                    prompt_str = f"""Can changing {variable_a}, {description_a}, change {variable_b}, {description_b}?
                         A. Yes
                         B. No
                         Within one sentence, let's think step-by-step to make sure that we have the right answer.  
                         Then provide your final answer within the tags, <answer>A/B</answer>.
                         """
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -110,37 +112,46 @@ class TuebingenModelSuggester(ModelSuggester):
         query = {}
 
         if use_context:
-            query["system"] = f"""You are a helpful assistant for writing concise and peer-reviewed descriptions. Your goal is 
+            sys_prompt = f"""You are a helpful assistant for writing concise and peer-reviewed descriptions. Your goal is 
             to provide factual and succinct descriptions related to the given concept and context."""
-            query["user"] = f"""Using this context about the particular variable, describe the concept of {variable}.
-            In one sentence, provide a factual and succinct description of {variable}"""
+            query["system"] = cleandoc(sys_prompt)
+            user_prompt = f"""Using this context about the particular variable, describe the concept of {variable}.
+            In one sentence, provide a factual and succinct description of {variable}."""
+            query["user"] = cleandoc(user_prompt)
 
             if ask_reference:
-                query["user"] += f"""Then provide two research papers that support your description.
+                query["user"] += " " # cleandoc removes leading whitespace, so need to add separately
+                user_prompt = f"""Then provide two research papers that support your description.
                 Let's think step-by-step to make sure that we have a proper and clear description. Then provide your final 
                 answer within the tags, <description></description>, and each research paper within the tags <reference></reference>."""
+                query["user"] += cleandoc(user_prompt)
 
             else:
-                query["user"] += f"""
-                    Let's think step-by-step to make sure that we have a proper and clear description. Then provide your final 
-                    answer within the tags, <description></description>."""
+                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
+                user_prompt = f"""Let's think step-by-step to make sure that we have a proper and clear description. Then provide your final 
+                answer within the tags, <description></description>."""
+                query["user"] += cleandoc(user_prompt)
 
         else:
-            query["system"] = f"""You are a helpful assistant for writing concise and peer-reviewed descriptions. Your goal 
+            sys_prompt = f"""You are a helpful assistant for writing concise and peer-reviewed descriptions. Your goal 
             is to provide factual and succinct description of the given concept."""
-            query["user"] = f""" Describe the concept of {variable}.
-                    In one sentence, provide a factual and succinct description of {variable}"""
+            user_prompt = f"""Describe the concept of {variable}.
+                    In one sentence, provide a factual and succinct description of {variable}."""
+            query["system"] = cleandoc(sys_prompt)
+            query["user"] = cleandoc(user_prompt)
 
             if ask_reference:
-                query["user"] += f""""
-                        Then provide two research papers that support your description.
+                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
+                user_prompt = f"""Then provide two research papers that support your description.
                         Let's think step-by-step to make sure that we have a proper and clear description. Then provide 
                         your final answer within the tags, <description></description>, and each research paper within the 
                         tags <paper></paper>."""
+                query["user"] += cleandoc(user_prompt)
             else:
-                query["user"] += f"""
-                        Let's think step-by-step to make sure that we have a proper and clear description. Then provide 
+                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
+                user_prompt = f"""Let's think step-by-step to make sure that we have a proper and clear description. Then provide 
                         your final answer within the tags, <description></description>."""
+                query["user"] += cleandoc(user_prompt)
         return query
 
     def suggest_relationship(
@@ -304,5 +315,7 @@ class TuebingenModelSuggester(ModelSuggester):
                     query["user"] += f"""Answer Yes or No. Within one sentence, you are to think step-by-step to make sure 
                     that you have the right answer. Then provide your final answer within the tags, <answer>Yes/No</answer>.
                         \n\n\n----------------\n\n\nExample of output structure: <answer>Yes</answer>\n\n\n----------------\n\n\nExample of output structure: <answer>No</answer>"""
+        query["user"] = cleandoc(query["user"])
+        query["system"] = cleandoc(query["system"])
 
         return query

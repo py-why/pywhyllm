@@ -1,7 +1,7 @@
 import guidance
 from guidance import system, user, assistant, gen
 import re
-
+from inspect import cleandoc
 
 class SimpleIdentificationSuggester:
 
@@ -16,9 +16,10 @@ class SimpleIdentificationSuggester:
             lm += "You are a helpful assistant for causal reasoning."
 
         with user():
-            lm += f"""Which factors in {factors} might be valid instrumental variables for identifying the effect of {treatment} on {outcome}?
+            prompt_str = f"""Which factors in {factors} might be valid instrumental variables for identifying the effect of {treatment} on {outcome}?
 
             List the factors that are possible instrumental variables in <iv> </iv> tags."""
+            lm += cleandoc(prompt_str)
         with assistant():
             lm += gen("iv")
 
@@ -33,10 +34,11 @@ class SimpleIdentificationSuggester:
             lm += "You are a helpful assistant for causal reasoning."
 
         with user():
-            lm += f"""Which set or subset of factors in {factors} might satisfy the backdoor criteria for identifying the effect of {treatment} on {outcome}?
+            prompt_str = f"""Which set or subset of factors in {factors} might satisfy the backdoor criteria for identifying the effect of {treatment} on {outcome}?
 
             List the factors satisfying the backdoor criteria enclosing the name of each factor in <backdoor> </backdoor> tags.
             """
+            lm += cleandoc(prompt_str)
         with assistant():
             lm += gen("backdoors")
 
@@ -51,10 +53,11 @@ class SimpleIdentificationSuggester:
             lm += "You are a helpful assistant for causal reasoning."
 
         with user():
-            lm += f"""Which set or subset of factors in {factors} might satisfy the frontdoor criteria for identifying the effect of {treatment} on {outcome}?
+            prompt_str = f"""Which set or subset of factors in {factors} might satisfy the frontdoor criteria for identifying the effect of {treatment} on {outcome}?
 
             List the factors satisfying the frontdoor criteria enclosing the name of each factor in <frontdoor> </frontdoor> tags.
             """
+            lm += cleandoc(prompt_str)
         with assistant():
             lm += gen("frontdoors")
 

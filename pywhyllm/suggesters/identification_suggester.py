@@ -4,7 +4,7 @@ from .model_suggester import ModelSuggester
 import guidance
 from guidance import system, user, assistant, gen
 import re
-
+import inspect
 
 class IdentificationSuggester(IdentifierProtocol):
     CONTEXT: str = """causal mechanisms"""
@@ -199,14 +199,15 @@ class IdentificationSuggester(IdentifierProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in {domain_expertise} and are studying {analysis_context}. You are using your 
+                    prompt_str = f"""You are an expert in {domain_expertise} and are studying {analysis_context}. You are using your 
                 knowledge to help build a causal model that contains all the assumptions about the factors that are directly 
                 influencing athe {outcome}. Where a causal model is a conceptual model that describes the causal mechanisms 
                 of a system. You will do this by by answering questions about cause and effect and using your domain knowledge 
                 in {domain_expertise}. Follow the next two steps, and complete the first one before moving on to the second:"""
+                    lm += inspect.cleandoc(prompt_str)
 
                 with user():
-                    lm += f"""(1) From your perspective as an expert in {domain_expertise}, think step by step as you consider the factors 
+                    prompt_str = f"""(1) From your perspective as an expert in {domain_expertise}, think step by step as you consider the factors 
                 that may interact between the {treatment} and the {outcome}. Use your knowledge as an expert in 
                 {domain_expertise} to describe the mediators, if there are any at all, between {treatment} and the 
                 {outcome}. Be concise and keep your thinking within two paragraphs. Then provide your step by step chain 
@@ -223,6 +224,7 @@ class IdentificationSuggester(IdentifierProtocol):
                   the tags <mediating_factor>factor_name</mediating_factor>. Where factor_name is one of the items within the 
                   factor_names list. If a factor does not have a high likelihood of mediating, then do not wrap the factor with 
                   any tags. Your step by step answer as an in {domain_expertise}:"""
+                    lm += inspect.cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -314,15 +316,16 @@ class IdentificationSuggester(IdentifierProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in {domain_expertise} and are studying {analysis_context}. 
+                    prompt_str = f"""You are an expert in {domain_expertise} and are studying {analysis_context}. 
                         You are using your knowledge to help build a causal model that contains all the assumptions about the factors 
                         that are directly influencing the {outcome}. Where a causal model is a conceptual model that describes the 
                         causal mechanisms of a system. You will do this by by answering questions about cause and effect and using 
                         your domain knowledge in {domain_expertise}. Follow the next two steps, and complete the first one before 
                         moving on to the second:"""
+                    lm += inspect.cleandoc(prompt_str)
 
                 with user():
-                    lm += f"""(1) From your perspective as an expert in {domain_expertise}, think step by step 
+                    prompt_str = f"""(1) From your perspective as an expert in {domain_expertise}, think step by step 
                        as you consider the factors that may interact with the {treatment} and do not interact with {outcome}. 
                        Use your knowlegde as an expert in {domain_expertise} to describe the instrumental variable(s), 
                        if there are any at all, that both has/have a high likelihood of influecing and causing the {treatment} and 
@@ -341,6 +344,7 @@ class IdentificationSuggester(IdentifierProtocol):
                        Where factor_name is one of the items within the factor_names list. If a factor does not have a high 
                        likelihood of being an instrumental variable, then do not wrap the factor with any tags. Your step by step 
                        answer as an in {domain_expertise}:"""
+                    lm += inspect.cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
