@@ -24,7 +24,7 @@ class ValidationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -65,7 +65,7 @@ class ValidationSuggester(IdentifierProtocol):
             factors_list: list(),
             negative_controls_counter: list(),
             domain_expertise: str,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         negative_controls_list: List[str] = list()
 
@@ -132,7 +132,7 @@ class ValidationSuggester(IdentifierProtocol):
             treatment: str,
             outcome: str,
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -166,7 +166,7 @@ class ValidationSuggester(IdentifierProtocol):
             outcome: str,
             latent_confounders_counter: list(),
             domain_expertise: str,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         latent_confounders_list: List[str] = list()
 
@@ -224,7 +224,7 @@ class ValidationSuggester(IdentifierProtocol):
             factor,
             factors_list,
             domain_expertise,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         edited_factors_list: List[str] = []
 
@@ -275,7 +275,7 @@ class ValidationSuggester(IdentifierProtocol):
             factor,
             factors_list,
             domain_expertise,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         edited_factors_list: List[str] = []
 

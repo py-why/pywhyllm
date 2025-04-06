@@ -3,8 +3,7 @@ from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.tuebingen_model_suggester import TuebingenModelSuggester, Strategy
-from pywhyllm.tests.model_suggester.data_providers.tuebingen_model_suggester_data_provider import *
-
+from tests.model_suggester.data_providers.tuebingen_model_suggester_data_provider import *
 
 class TestTuebingenModelSuggester(unittest.TestCase):
     def test_suggest_description(self):

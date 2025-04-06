@@ -43,7 +43,7 @@ factors_list = ["a", "b", "c"]
 treatment = "treatment"
 outcome = "outcome"
 
-#Suggest a list of domain expertises
+# Suggest a list of domain expertises
 domain_expertises = modeler.suggest_domain_expertises(factors_list)
 
 # Suggest a set of potential confounders

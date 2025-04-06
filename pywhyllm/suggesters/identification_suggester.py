@@ -118,7 +118,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         backdoor_set = self.model_suggester.suggest_confounders(
@@ -138,7 +138,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         pass
@@ -149,7 +149,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -189,7 +189,7 @@ class IdentificationSuggester(IdentifierProtocol):
             domain_expertise,
             factors_list,
             mediators_edges,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         mediators: List[str] = list()
 
@@ -262,7 +262,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome: str,
             factors_list: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()

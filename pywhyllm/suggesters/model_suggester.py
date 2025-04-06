@@ -19,7 +19,7 @@ class ModelSuggester(ModelerProtocol):
             self,
             factors_list,
             n_experts: int = 1,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
 
         expertise_list: List[str] = list()
@@ -62,7 +62,7 @@ class ModelSuggester(ModelerProtocol):
             self,
             factors_list,
             n_experts: int = 5,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
 
         experts_list: Set[str] = set()
@@ -104,7 +104,7 @@ class ModelSuggester(ModelerProtocol):
             self,
             factors_list,
             n_stakeholders: int = 5,  # must be > 1
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
 
         stakeholder_list: List[str] = list()
@@ -194,7 +194,7 @@ class ModelSuggester(ModelerProtocol):
             domain_expertise,
             factors_list,
             confounders_edges,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         confounders: List[str] = list()
 
@@ -265,7 +265,7 @@ class ModelSuggester(ModelerProtocol):
             domain_expertise,
             factor,
             factors_list,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         parent_candidates: List[str] = []
 
@@ -330,7 +330,7 @@ class ModelSuggester(ModelerProtocol):
             domain_expertise,
             factor,
             factors_list,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
 
         children_candidates: List[str] = []
