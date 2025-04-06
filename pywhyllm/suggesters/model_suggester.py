@@ -5,7 +5,7 @@ import guidance
 from guidance import system, user, assistant, gen
 from ..helpers import RelationshipStrategy
 import re
-
+from inspect import cleandoc
 
 class ModelSuggester(ModelerProtocol):
     CONTEXT: str = """causal mechanisms"""
@@ -32,13 +32,14 @@ class ModelSuggester(ModelerProtocol):
                 with system():
                     lm += f"""You are a helpful assistant for recommending useful domain expertises."""
                 with user():
-                    lm += f"""What domain expertises have the knowledge and experience needed to identify causal 
+                    prompt_str = f"""What domain expertises have the knowledge and experience needed to identify causal 
                     relationships and causal influences between the {analysis_context}? What domain expertises are needed 
                     to work with and reason about the causal influence between {factors_list}? What domain expertises 
                     have the knowledge and experience to reason and answer questions about influence and cause between 
                     such factors? Think about this in a step by step manner and recommend {n_experts} expertises and 
                     provide each one wrapped within the tags, <domain_expertise></domain_expertise>, along with the 
                     reasoning and explanation wrapped between the tags <explanation></explanation>."""
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -74,13 +75,14 @@ class ModelSuggester(ModelerProtocol):
                 with system():
                     lm += f"""You are a helpful assistant for recommending useful domain experts."""
                 with user():
-                    lm += f"""What domain experts have the knowledge and experience needed to identify causal relationships 
+                    prompt_str = f"""What domain experts have the knowledge and experience needed to identify causal relationships 
                     and causal influences between the {analysis_context}? What experts are needed to work with and 
                     reason about the causal influence between {factors_list}? What domain experts have the knowledge 
                     and experience to reason and answer questions about influence and cause between such factors? Think 
                     about this in a step by step manner and recommend {n_experts} domain experts and provide each one 
                     wrapped within the tags, <domain_expert></domain_expert>, along with the reasoning and explanation 
                     wrapped between the tags <explanation></explanation>."""
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -118,12 +120,13 @@ class ModelSuggester(ModelerProtocol):
                     lm += "You are a helpful assistant for recommending useful primary and secondary stakeholders."
 
                 with user():
-                    lm += f"""What stakeholders have knowledge and experience in and about {analysis_context}? 
-                                    What stakeholders can work best with and reason well about the causal influence between 
+                    prompt_str = f"""What stakeholders have knowledge and experience in and about {analysis_context}? 
+                What stakeholders can work best with and reason well about the causal influence between 
                 {factors_list}? What stakeholders have the knowledge and experience useful to reason within this context? Think about 
                 this in a step by step manner and recommend {n_stakeholders} stakeholders. Then provide each useful stakeholder 
                 wrapped within the tags, <stakeholder></stakeholder>, along with the reasoning and explanation wrapped between the tags
                 <explanation></explanation>."""
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -204,13 +207,14 @@ class ModelSuggester(ModelerProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in {domain_expertise} and are studying {analysis_context}.
-                You are using your knowledge to help build a causal model that contains all the assumptions about {
+                    prompt_str = f"""You are an expert in {domain_expertise} and are studying {analysis_context}.
+                    You are using your knowledge to help build a causal model that contains all the assumptions about {
                     analysis_context}. Where a causal model is a conceptual model that describes the causal mechanisms of a 
-                        system. You
-                will do this by by answering questions about cause and effect and using your domain knowledge in {domain_expertise}."""
+                    system. You
+                    will do this by answering questions about cause and effect and using your domain knowledge in {domain_expertise}."""
+                    lm += cleandoc(prompt_str)
                 with user():
-                    lm += f"""Follow the next two steps, and complete the first one before moving on to the second: (1) 
+                    prompt_str = f"""Follow the next two steps, and complete the first one before moving on to the second: (1) 
                                 From your perspective as an 
                 expert in {domain_expertise}, think step by step as you consider the factors that may interact between the {treatment} 
                 and the {outcome}. Use your knowlegde as an expert in {domain_expertise} to describe the confounders, if there are any 
@@ -230,6 +234,7 @@ class ModelSuggester(ModelerProtocol):
                 <confounding_factor>factor_name</confounding_factor> where 
                 factor_name is one of the items within the factor_names list. If a factor does not have a high likelihood of directly 
                 confounding, then do not wrap the factor with any tags."""
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -284,7 +289,7 @@ class ModelSuggester(ModelerProtocol):
                     lm += f"""You are an expert in {domain_expertise} and are studying {analysis_context}"""
 
                 with user():
-                    lm += f"""You are using your knowledge to help build a causal model that 
+                    prompt_str = f"""You are using your knowledge to help build a causal model that 
                             contains all the assumptions about the factors that are directly influencing 
                             and causing the {factor}. Where a causal model is a conceptual model that describes the 
                             causal mechanisms of a system. You will do this by by answering questions about cause and 
@@ -306,6 +311,7 @@ class ModelSuggester(ModelerProtocol):
 {factor}, 
                             then do not wrap the factor with any tags. Your answer as an expert in 
 {domain_expertise}:"""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -349,7 +355,7 @@ class ModelSuggester(ModelerProtocol):
                 with system():
                     lm += f"""You are an expert in {domain_expertise} and are studying {analysis_context}"""
                 with user():
-                    lm += f"""You are using your knowledge to help build a causal model that 
+                    prompt_str = f"""You are using your knowledge to help build a causal model that 
                             contains all the assumptions about the factors that are directly influencing and causing the {factor}. 
                             Where a 
                             causal model is a conceptual model that describes the causal mechanisms of a system. You will do this by by 
@@ -377,7 +383,7 @@ class ModelSuggester(ModelerProtocol):
                             factor_names list. If a factor does not have a high likelihood of directly influencing and causing the {
                     factor}, then do not wrap the factor with any tags. Your answer as an expert in 
                 {domain_expertise}:"""
-
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -410,7 +416,7 @@ class ModelSuggester(ModelerProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in {domain_expertise} and are 
+                    prompt_str = f"""You are an expert in {domain_expertise} and are 
                             studying {analysis_context}. You are using your knowledge to help build a causal model that contains 
                             all the 
                             assumptions about {analysis_context}. Where a causal model is a conceptual model that describes the 
@@ -418,8 +424,9 @@ class ModelSuggester(ModelerProtocol):
                             mechanisms of a system. You will do this by by answering questions about cause and effect and using your 
                             domain 
                             knowledge as an expert in {domain_expertise}."""
+                    lm += cleandoc(prompt_str)
                 with user():
-                    lm += f"""From your perspective as an expert in {domain_expertise}, which of the following is 
+                    prompt_str = f"""From your perspective as an expert in {domain_expertise}, which of the following is 
                                     most likely true? (A) {factor_a} affects {factor_b}; {factor_a} has a high likelihood of directly 
                                     influencing {factor_b}; and {factor_a} causes {factor_b}. (B) {factor_b} affects {factor_a}; 
                 {factor_b} has a high likelihood of directly influencing {factor_a}; and {factor_b} causes {factor_a}. (C) Neither A 
@@ -429,6 +436,7 @@ class ModelSuggester(ModelerProtocol):
                 you reach a conclusion, wrap your answer within the tags <answer></answer>. If you are done thinking, provide your 
                 answer wrapped within the tags <answer></answer>. e.g. <answer>A</answer>, <answer>B</answer>, or <answer>C</answer>. 
                 Your answer as an expert in {domain_expertise}:"""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")

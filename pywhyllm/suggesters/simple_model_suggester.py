@@ -3,7 +3,7 @@ import guidance
 import re
 import itertools
 from guidance import system, user, assistant, gen
-
+from inspect import cleandoc
 
 class SimpleModelSuggester:
     """
@@ -43,8 +43,9 @@ class SimpleModelSuggester:
             lm += "You are a helpful assistant for causal reasoning."
 
         with user():
-            lm += f"""Which cause-and-effect-relationship is more likely? Provide reasoning and give your final answer (A, B, or C) in <answer> </answer> tags with the letter only and no whitespaces.
+            prompt_str = f"""Which cause-and-effect-relationship is more likely? Provide reasoning and give your final answer (A, B, or C) in <answer> </answer> tags with the letter only and no whitespaces.
             A. {variable1} causes {variable2} B. {variable2} causes {variable1} C. neither {variable1} nor {variable2} cause each other."""
+            lm += cleandoc(prompt_str)
 
         with assistant():
             lm += gen("description")
@@ -110,12 +111,13 @@ class SimpleModelSuggester:
             lm += "You are a helpful assistant for causal reasoning."
 
         with user():
-            lm += f"""What latent confounding factors might influence the relationship between {treatment} and {outcome}?
+            prompt_str = f"""What latent confounding factors might influence the relationship between {treatment} and {outcome}?
 
             We have already considered the following factors {variables}.  Please do not repeat them.
 
             List the confounding factors between {treatment} and {outcome} enclosing the name of each factor in <conf> </conf> tags.
             """
+            lm += cleandoc(prompt_str)
         with assistant():
             lm += gen("latents")
 
