@@ -4,7 +4,7 @@ from .model_suggester import ModelSuggester
 import guidance
 from guidance import system, user, assistant, gen
 import re
-import inspect
+from inspect import cleandoc
 
 class IdentificationSuggester(IdentifierProtocol):
     CONTEXT: str = """causal mechanisms"""
@@ -204,7 +204,7 @@ class IdentificationSuggester(IdentifierProtocol):
                 influencing athe {outcome}. Where a causal model is a conceptual model that describes the causal mechanisms 
                 of a system. You will do this by by answering questions about cause and effect and using your domain knowledge 
                 in {domain_expertise}. Follow the next two steps, and complete the first one before moving on to the second:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
 
                 with user():
                     prompt_str = f"""(1) From your perspective as an expert in {domain_expertise}, think step by step as you consider the factors 
@@ -224,7 +224,7 @@ class IdentificationSuggester(IdentifierProtocol):
                   the tags <mediating_factor>factor_name</mediating_factor>. Where factor_name is one of the items within the 
                   factor_names list. If a factor does not have a high likelihood of mediating, then do not wrap the factor with 
                   any tags. Your step by step answer as an in {domain_expertise}:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -322,7 +322,7 @@ class IdentificationSuggester(IdentifierProtocol):
                         causal mechanisms of a system. You will do this by by answering questions about cause and effect and using 
                         your domain knowledge in {domain_expertise}. Follow the next two steps, and complete the first one before 
                         moving on to the second:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
 
                 with user():
                     prompt_str = f"""(1) From your perspective as an expert in {domain_expertise}, think step by step 
@@ -344,7 +344,7 @@ class IdentificationSuggester(IdentifierProtocol):
                        Where factor_name is one of the items within the factor_names list. If a factor does not have a high 
                        likelihood of being an instrumental variable, then do not wrap the factor with any tags. Your step by step 
                        answer as an in {domain_expertise}:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 

@@ -120,17 +120,17 @@ class TuebingenModelSuggester(ModelSuggester):
             query["user"] = cleandoc(user_prompt)
 
             if ask_reference:
-                query["user"] += " " # cleandoc removes leading whitespace, so need to add separately
                 user_prompt = f"""Then provide two research papers that support your description.
                 Let's think step-by-step to make sure that we have a proper and clear description. Then provide your final 
-                answer within the tags, <description></description>, and each research paper within the tags <reference></reference>."""
-                query["user"] += cleandoc(user_prompt)
+                answer within the tags, <description></description>, and each research paper within the tags <reference></reference>.""" 
+                # cleandoc removes leading whitespace, so need to add separately
+                query["user"] += " " + cleandoc(user_prompt)
 
             else:
-                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
                 user_prompt = f"""Let's think step-by-step to make sure that we have a proper and clear description. Then provide your final 
                 answer within the tags, <description></description>."""
-                query["user"] += cleandoc(user_prompt)
+                # cleandoc removes leading whitespace, so need to add separately
+                query["user"] += "\n" + cleandoc(user_prompt)
 
         else:
             sys_prompt = f"""You are a helpful assistant for writing concise and peer-reviewed descriptions. Your goal 
@@ -141,17 +141,16 @@ class TuebingenModelSuggester(ModelSuggester):
             query["user"] = cleandoc(user_prompt)
 
             if ask_reference:
-                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
                 user_prompt = f"""Then provide two research papers that support your description.
                         Let's think step-by-step to make sure that we have a proper and clear description. Then provide 
                         your final answer within the tags, <description></description>, and each research paper within the 
                         tags <paper></paper>."""
-                query["user"] += cleandoc(user_prompt)
+                # cleandoc removes leading whitespace, so need to add separately
+                query["user"] += "\n" + cleandoc(user_prompt)
             else:
-                query["user"] += "\n" # cleandoc removes leading whitespace, so need to add separately
                 user_prompt = f"""Let's think step-by-step to make sure that we have a proper and clear description. Then provide 
                         your final answer within the tags, <description></description>."""
-                query["user"] += cleandoc(user_prompt)
+                query["user"] += "\n" + cleandoc(user_prompt)
         return query
 
     def suggest_relationship(
@@ -258,10 +257,10 @@ class TuebingenModelSuggester(ModelSuggester):
                 if use_description:
                     user_prompt = f"""can changing {variable_a}, where {description_a}, change {variable_b}, where 
     {description_b}? Answer Yes or No."""
-                    query["user"] += cleandoc(user_prompt)
+                    query["user"] = cleandoc(user_prompt)
                 else:
                     user_prompt = f"""can changing {variable_a} change {variable_b}? Answer Yes or No."""
-                    query["user"] += cleandoc(user_prompt)
+                    query["user"] = cleandoc(user_prompt)
 
                 if ask_reference:
                     user_prompt = f"""At each step, each expert include a reference to a research paper that supports 

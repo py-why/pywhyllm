@@ -5,7 +5,7 @@ import guidance
 from guidance import system, user, assistant, gen
 from ..helpers import RelationshipStrategy
 import re
-import inspect
+from inspect import cleandoc
 
 class ModelSuggester(ModelerProtocol):
     CONTEXT: str = """causal mechanisms"""
@@ -39,7 +39,7 @@ class ModelSuggester(ModelerProtocol):
                     such factors? Think about this in a step by step manner and recommend {n_experts} expertises and 
                     provide each one wrapped within the tags, <domain_expertise></domain_expertise>, along with the 
                     reasoning and explanation wrapped between the tags <explanation></explanation>."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -82,7 +82,7 @@ class ModelSuggester(ModelerProtocol):
                     about this in a step by step manner and recommend {n_experts} domain experts and provide each one 
                     wrapped within the tags, <domain_expert></domain_expert>, along with the reasoning and explanation 
                     wrapped between the tags <explanation></explanation>."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -126,7 +126,7 @@ class ModelSuggester(ModelerProtocol):
                 this in a step by step manner and recommend {n_stakeholders} stakeholders. Then provide each useful stakeholder 
                 wrapped within the tags, <stakeholder></stakeholder>, along with the reasoning and explanation wrapped between the tags
                 <explanation></explanation>."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -212,7 +212,7 @@ class ModelSuggester(ModelerProtocol):
                     analysis_context}. Where a causal model is a conceptual model that describes the causal mechanisms of a 
                     system. You
                     will do this by answering questions about cause and effect and using your domain knowledge in {domain_expertise}."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with user():
                     prompt_str = f"""Follow the next two steps, and complete the first one before moving on to the second: (1) 
                                 From your perspective as an 
@@ -234,7 +234,7 @@ class ModelSuggester(ModelerProtocol):
                 <confounding_factor>factor_name</confounding_factor> where 
                 factor_name is one of the items within the factor_names list. If a factor does not have a high likelihood of directly 
                 confounding, then do not wrap the factor with any tags."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -311,7 +311,7 @@ class ModelSuggester(ModelerProtocol):
 {factor}, 
                             then do not wrap the factor with any tags. Your answer as an expert in 
 {domain_expertise}:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -383,7 +383,7 @@ class ModelSuggester(ModelerProtocol):
                             factor_names list. If a factor does not have a high likelihood of directly influencing and causing the {
                     factor}, then do not wrap the factor with any tags. Your answer as an expert in 
                 {domain_expertise}:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -424,7 +424,7 @@ class ModelSuggester(ModelerProtocol):
                             mechanisms of a system. You will do this by by answering questions about cause and effect and using your 
                             domain 
                             knowledge as an expert in {domain_expertise}."""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
                 with user():
                     prompt_str = f"""From your perspective as an expert in {domain_expertise}, which of the following is 
                                     most likely true? (A) {factor_a} affects {factor_b}; {factor_a} has a high likelihood of directly 
@@ -436,7 +436,7 @@ class ModelSuggester(ModelerProtocol):
                 you reach a conclusion, wrap your answer within the tags <answer></answer>. If you are done thinking, provide your 
                 answer wrapped within the tags <answer></answer>. e.g. <answer>A</answer>, <answer>B</answer>, or <answer>C</answer>. 
                 Your answer as an expert in {domain_expertise}:"""
-                    lm += inspect.cleandoc(prompt_str)
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
