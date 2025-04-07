@@ -1,5 +1,6 @@
 import itertools
 from typing import List, Tuple, Dict, Set
+from inspect import cleandoc
 from ..protocols import IdentifierProtocol
 from ..helpers import RelationshipStrategy, ModelType
 from ..prompts import prompts as ps
@@ -75,14 +76,15 @@ class ValidationSuggester(IdentifierProtocol):
                 lm = self.llm
 
                 with system():
-                    lm += f"""You are an expert in the {domain_expertise} and are 
+                    prompt_str = f"""You are an expert in the {domain_expertise} and are 
             studying the {analysis_context}. You are using your domain knowledge to help understand the negative 
             controls for a causal model that contains all the assumptions about the {analysis_context}. Where a causal 
             model is a conceptual model that describes the causal mechanisms of a system. You will do this by answering 
             questions about cause and effect using your domain knowledge in the {domain_expertise}."""
+                    lm += cleandoc(prompt_str)
 
                 with user():
-                    lm += f"""factor_names: {factors_list} From your perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
+                    prompt_str = f"""factor_names: {factors_list} From your perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
                              the {analysis_context}, should see zero treatment effect when changing the {treatment}? Which factor(s) 
                              from the list of factors, if any at all, relevant to the {analysis_context}, are negative controls on the 
                              causal mechanisms that affect the {outcome} when changing {treatment}? Using your domain knowledge, 
@@ -98,6 +100,7 @@ class ValidationSuggester(IdentifierProtocol):
                              is one of the items within the factor_names list. If a factor does not have a high likelihood of being a 
                              negative control relevant to the {analysis_context}, then do not wrap the factor with any tags. Provide 
                              your step by step answer as an expert in the {domain_expertise}:"""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -175,12 +178,13 @@ class ValidationSuggester(IdentifierProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are an expert in the {domain_expertise} and are studying the {analysis_context}. You are using your knowledge to help build a causal model that contains 
+                    prompt_str = f"""You are an expert in the {domain_expertise} and are studying the {analysis_context}. You are using your knowledge to help build a causal model that contains 
                                 all the assumptions about the {domain_expertise}. Where a causal model is a conceptual model that describes 
                                 the causal mechanisms of a system. You will do this by by answering questions about cause and effect and 
                                 using your domain knowledge in the {domain_expertise}."""
+                    lm += cleandoc(prompt_str)
                 with user():
-                    lm += f"""(1) From your perspective as an expert in the {domain_expertise}, think step by step as you consider the factors that may interact 
+                    prompt_str = f"""(1) From your perspective as an expert in the {domain_expertise}, think step by step as you consider the factors that may interact 
                                  between the {treatment} and the {outcome}. Use your knowledge as an expert in the {domain_expertise} to 
                                  describe the confounders, if there are any at all, between the {treatment} and the {outcome}. Be concise 
                                  and keep your thinking within two paragraphs. Then provide your step by step chain of thoughts within the 
@@ -194,6 +198,7 @@ class ValidationSuggester(IdentifierProtocol):
                                  {treatment} and the {outcome}, within the tags <confounding_factor>factor_name</confounding_factor>. If a 
                                  factor does not have a high likelihood of directly confounding, then do not wrap the factor with any tags. 
                                  Your step by step answer as an expert in the {domain_expertise}:"""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -240,10 +245,11 @@ class ValidationSuggester(IdentifierProtocol):
             try:
                 lm = self.llm
                 with system():
-                    lm += f"""You are a helpful causal assistant and expert in {domain_expertise}, 
+                    prompt_str = f"""You are a helpful causal assistant and expert in {domain_expertise}, 
                                 studying {analysis_context}. Task: identify factors causing {factor}."""
+                    lm += cleandoc(prompt_str)
                 with user():
-                    lm += f"""Steps: (1) 
+                    prompt_str = f"""Steps: (1) 
                                 Analyze potential factors [{factors_list}] for factors directly influencing/causing/affecting {
                     factor}. Is relationship direct? Ignore feedback mechanisms/factors not in list. Keep thoughts within 
                                 <thinking></thinking> tags. (2) Use prior thoughts to answer: how {factor} influenced/caused/affected by  [
@@ -251,6 +257,7 @@ class ValidationSuggester(IdentifierProtocol):
                                 factors highly likely directly influencing/causing/affecting {factor} in 
                                 <influencing_factor></influencing_factor> tags. No tags for low likelihood factors. Ignore feedback 
                                 mechanisms/factors not in list. Answer as {domain_expertise} expert."""
+                    lm += cleandoc(prompt_str)
                 with assistant():
                     lm += gen("output")
 
@@ -292,11 +299,12 @@ class ValidationSuggester(IdentifierProtocol):
                 lm = self.llm
 
                 with system():
-                    lm += f"""You are a helpful causal assistant and expert in {domain_expertise}, 
+                    prompt_str = f"""You are a helpful causal assistant and expert in {domain_expertise}, 
                                 studying {analysis_context}. Task: identify factors caused by {factor}."""
+                    lm += cleandoc(prompt_str)
 
                 with user():
-                    lm += f"""Steps: (
+                    prompt_str = f"""Steps: (
                                 1) Analyze potential factors [{factors_list}] for factors directly influenced/caused/affected by 
                                 {factor}. Is relationship direct? Ignore feedback mechanisms/factors not in list. Keep thoughts within 
                                 <thinking></thinking> tags. (2) Use prior thoughts to answer: how {factor} influences/causes/affects [{
@@ -304,6 +312,7 @@ class ValidationSuggester(IdentifierProtocol):
                                 factors highly likely directly influenced/caused/affected by {factor} in 
                                 <influenced_factor></influenced_factor> tags. No tags for low likelihood factors. Ignore feedback 
                                 mechanisms/factors not in list. Answer as {domain_expertise} expert."""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
@@ -338,16 +347,18 @@ class ValidationSuggester(IdentifierProtocol):
                 lm = self.llm
 
                 with system():
-                    lm += f"""You are a helpful causal assistant, expert in {domain_expertise}, 
+                    prompt_str = f"""You are a helpful causal assistant, expert in {domain_expertise}, 
                                 studying {analysis_context}. Task: identify relationship between {factor_a} and {factor_b}."""
+                    lm += cleandoc(prompt_str)
 
                 with user():
-                    lm += f"""Steps: (1) Does {factor_a} influence/cause/affect {factor_b}? Is relationship direct? Does {factor_b} influence/cause/affect 
+                    prompt_str = f"""Steps: (1) Does {factor_a} influence/cause/affect {factor_b}? Is relationship direct? Does {factor_b} influence/cause/affect 
                                 {factor_a}? Is relationship direct? Ignore feedback mechanisms/factors not in list. Keep thoughts within 
                                 <thinking></thinking> tags. (2) Use prior thoughts to select likely answer: (A) {factor_a} influences {factor_b} (B) {
                     factor_b} influences {factor_a} (C) Neither. Wrap answer in <answer></answer>. e.g. <answer>A</answer>, 
                                 <answer>B</answer>, <answer>C</answer>. No tags for low likelihood factors. Ignore feedback 
                                 mechanisms/factors not in list. Answer as {domain_expertise} expert."""
+                    lm += cleandoc(prompt_str)
 
                 with assistant():
                     lm += gen("output")
