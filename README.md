@@ -39,9 +39,9 @@ from pywhyllm import RelationshipStrategy
 # Create instance of Modeler
 modeler = ModelSuggester('gpt-4')
 
-factors_list = ["a", "b", "c"]
-treatment = "treatment"
-outcome = "outcome"
+factors_list = ["smoking", "lung cancer", "exercise habits", "air pollution exposure"]
+treatment = "smoking"
+outcome = "lung cancer"
 
 # Suggest a list of domain expertises
 domain_expertises = modeler.suggest_domain_expertises(factors_list)
