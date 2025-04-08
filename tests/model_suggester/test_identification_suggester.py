@@ -4,8 +4,9 @@ from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.identification_suggester import IdentificationSuggester
 from pywhyllm.suggesters.model_suggester import ModelSuggester
-from pywhyllm.tests.model_suggester.data_providers.model_suggester_data_provider import *
-from pywhyllm.tests.model_suggester.data_providers.identification_suggester_data_provider import *
+from tests.model_suggester.data_providers.identification_suggester_data_provider import *
+from tests.model_suggester.data_providers.model_suggester_data_provider import *
+
 
 class TestIdentificationSuggester(unittest.TestCase):
     def test_suggest_backdoor(self):
