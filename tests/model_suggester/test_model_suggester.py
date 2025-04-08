@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.model_suggester import ModelSuggester
-from pywhyllm.tests.model_suggester.data_providers.model_suggester_data_provider import *
 from pywhyllm.helpers import RelationshipStrategy
+from tests.model_suggester.data_providers.model_suggester_data_provider import *
 
 
 class TestModelSuggester(unittest.TestCase):

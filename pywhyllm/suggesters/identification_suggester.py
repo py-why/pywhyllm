@@ -19,7 +19,7 @@ class IdentificationSuggester(IdentifierProtocol):
     #     self,
     #     treatment: str,
     #     outcome: str,
-    #     factors_list: list(),
+    #     all_factors: list(),
     #     llm: guidance.models,
     #     backdoor: Set[str] = None,
     #     frontdoor: Set[str] = None,
@@ -41,7 +41,7 @@ class IdentificationSuggester(IdentifierProtocol):
     #         backdoor_edges, backdoor_set = self.suggest_backdoor(
     #             treatment=treatment,
     #             outcome=outcome,
-    #             factors_list=factors_list,
+    #             all_factors=all_factors,
     #             llm=llm,
     #             experts=experts,
     #             analysis_context=analysis_context,
@@ -66,7 +66,7 @@ class IdentificationSuggester(IdentifierProtocol):
     #         frontdoor_edges, frontdoor_set = self.suggest_frontdoor(
     #             treatment=treatment,
     #             outcome=outcome,
-    #             factors_list=factors_list,
+    #             all_factors=all_factors,
     #             llm=llm,
     #             experts=experts,
     #             analysis_context=analysis_context,
@@ -87,7 +87,7 @@ class IdentificationSuggester(IdentifierProtocol):
     #         ivs_edges, ivs_set = self.suggest_ivs(
     #             treatment=treatment,
     #             outcome=outcome,
-    #             factors_list=factors_list,
+    #             all_factors=all_factors,
     #             llm=llm,
     #             experts=experts,
     #             analysis_context=analysis_context,
@@ -116,15 +116,15 @@ class IdentificationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         backdoor_set = self.model_suggester.suggest_confounders(
             treatment=treatment,
             outcome=outcome,
-            factors_list=factors_list,
+            all_factors=all_factors,
             expertise_list=expertise_list,
             analysis_context=analysis_context,
             stakeholders=stakeholders
@@ -136,9 +136,9 @@ class IdentificationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         pass
@@ -147,9 +147,9 @@ class IdentificationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -164,16 +164,16 @@ class IdentificationSuggester(IdentifierProtocol):
         mediators_edges[(treatment, outcome)] = 1
 
         edited_factors_list: List[str] = []
-        for i in range(len(factors_list)):
-            if factors_list[i] != treatment and factors_list[i] != outcome:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != treatment and all_factors[i] != outcome:
+                edited_factors_list.append(all_factors[i])
 
         for expert in expert_list:
             mediators_edges, mediators_list = self.request_mediators(
                 treatment=treatment,
                 outcome=outcome,
                 domain_expertise=expert,
-                factors_list=edited_factors_list,
+                all_factors=edited_factors_list,
                 mediators_edges=mediators_edges,
                 analysis_context=analysis_context
             )
@@ -187,9 +187,9 @@ class IdentificationSuggester(IdentifierProtocol):
             treatment,
             outcome,
             domain_expertise,
-            factors_list,
+            all_factors,
             mediators_edges,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         mediators: List[str] = list()
 
@@ -218,7 +218,7 @@ class IdentificationSuggester(IdentifierProtocol):
                  on the causal chain that links the {treatment} to the {outcome}? From your perspective as an expert in 
                  {domain_expertise}, which factor(s) of the following factors, if any at all, mediates, is/are on the causal 
                  chain, that links the {treatment} to the {outcome}? Then provide your step by step chain of thoughts within 
-                 the tags <thinking></thinking>. factor_names : {factors_list} Wrap the name of the factor(s), if any at all, 
+                 the tags <thinking></thinking>. factor_names : {all_factors} Wrap the name of the factor(s), if any at all, 
                  that has/have a high likelihood of directly influencing and causing the assignment of the {outcome} and also 
                  has/have a high likelihood of being directly influenced and caused by the assignment of the {treatment} within
                   the tags <mediating_factor>factor_name</mediating_factor>. Where factor_name is one of the items within the 
@@ -237,7 +237,7 @@ class IdentificationSuggester(IdentifierProtocol):
                 if mediating_factor:
                     for factor in mediating_factor:
                         # to not add it twice into the list
-                        if factor in factors_list and factor not in mediators:
+                        if factor in all_factors and factor not in mediators:
                             mediators.append(factor)
                 success = True
 
@@ -262,9 +262,9 @@ class IdentificationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -279,9 +279,9 @@ class IdentificationSuggester(IdentifierProtocol):
         iv_edges[(treatment, outcome)] = 1
 
         edited_factors_list: List[str] = []
-        for i in range(len(factors_list)):
-            if factors_list[i] != treatment and factors_list[i] != outcome:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != treatment and all_factors[i] != outcome:
+                edited_factors_list.append(all_factors[i])
 
         for expert in expert_list:
             iv_edges, iv_list = self.request_ivs(
@@ -289,7 +289,7 @@ class IdentificationSuggester(IdentifierProtocol):
                 outcome=outcome,
                 analysis_context=analysis_context,
                 domain_expertise=expert,
-                factors_list=edited_factors_list,
+                all_factors=edited_factors_list,
                 iv_edges=iv_edges,
             )
 
@@ -305,7 +305,7 @@ class IdentificationSuggester(IdentifierProtocol):
             outcome,
             analysis_context,
             domain_expertise,
-            factors_list,
+            all_factors,
             iv_edges
     ):
         ivs: List[str] = list()
@@ -338,7 +338,7 @@ class IdentificationSuggester(IdentifierProtocol):
                        the {outcome}? Which factor(s) of the following factors, if any at all, are (an) instrumental variable(s) 
                        to the causal relationship of the {treatment} causing the {outcome}? Be concise and keep your thinking 
                        within two paragraphs. Then provide your step by step chain of thoughts within the tags 
-                       <thinking></thinking>. factor_names : {factors_list} Wrap the name of the factor(s), if there are any at 
+                       <thinking></thinking>. factor_names : {all_factors} Wrap the name of the factor(s), if there are any at 
                        all, that both has/have a high likelihood of influecing and causing the {treatment} and has/have a very low 
                        likelihood of influencing and causing the {outcome}, within the tags <iv_factor>factor_name</iv_factor>. 
                        Where factor_name is one of the items within the factor_names list. If a factor does not have a high 
@@ -353,7 +353,7 @@ class IdentificationSuggester(IdentifierProtocol):
 
                 if iv_factors:
                     for factor in iv_factors:
-                        if factor in factors_list and factor not in ivs:
+                        if factor in all_factors and factor not in ivs:
                             ivs.append(factor)
                 success = True
 

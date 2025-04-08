@@ -25,7 +25,10 @@ pip install pywhyllm
 PyWhy-LLM seamlessly integrates into your existing causal inference process. Import the necessary classes and start exploring the power of LLM-augmented causal analysis.
 
 ```python
-from pywhyllm import ModelSuggester, IdentificationSuggester, ValidationSuggester
+from pywhyllm.suggesters.model_suggester import ModelSuggester 
+from pywhyllm.suggesters.identification_suggester import IdentificationSuggester
+from pywhyllm.suggesters.validation_suggester import ValidationSuggester
+from pywhyllm import RelationshipStrategy
 
 ```
 
@@ -34,17 +37,20 @@ from pywhyllm import ModelSuggester, IdentificationSuggester, ValidationSuggeste
 
 ```python
 # Create instance of Modeler
-modeler = Modeler()
+modeler = ModelSuggester('gpt-4')
+
+all_factors = ["smoking", "lung cancer", "exercise habits", "air pollution exposure"]
+treatment = "smoking"
+outcome = "lung cancer"
+
+# Suggest a list of domain expertises
+domain_expertises = modeler.suggest_domain_expertises(all_factors)
 
 # Suggest a set of potential confounders
-suggested_confounders = modeler.suggest_confounders(variables=_variables, treatment=treatment, outcome=outcome, llm=gpt4)
+suggested_confounders = modeler.suggest_confounders(treatment, outcome, all_factors, domain_expertises)
 
 # Suggest pair-wise relationship between variables
-suggested_dag = modeler.suggest_relationships(variables=selected_variables, llm=gpt4)
-
-plt.figure(figsize=(10, 5))
-nx.draw(suggested_dag, with_labels=True, node_color='lightblue')
-plt.show()
+suggested_dag = modeler.suggest_relationships(treatment, outcome, all_factors, domain_expertises, RelationshipStrategy.Pairwise)
 ```
 
 
@@ -54,15 +60,13 @@ plt.show()
 
 ```python
 # Create instance of Identifier
-identifier = Identifier()
+identifier = IdentificationSuggester('gpt-4')
 
-# Suggest a backdoor set, front door set, and iv set
-suggested_backdoor = identifier.suggest_backdoor(llm=gpt4, treatment=treatment, outcome=outcome, confounders=suggested_confounders)
-suggested_frontdoor = identifier.suggest_frontdoor(llm=gpt4, treatment=treatment, outcome=outcome,  confounders=suggested_confounders)
-suggested_iv = identifier.suggest_iv(llm=gpt4, treatment=treatment, outcome=outcome,  confounders=suggested_confounders)
+# Suggest a backdoor set, mediator set, and iv set
+suggested_backdoor = identifier.suggest_backdoor(treatment, outcome, all_factors, domain_expertises)
+suggested_mediators = identifier.suggest_mediators(treatment, outcome, all_factors, domain_expertises)
+suggested_iv = identifier.suggest_ivs(treatment, outcome, all_factors, domain_expertises)
 
-# Suggest an estimand based on the suggester backdoor set, front door set, and iv set
-estimand = identifier.suggest_estimand(confounders=suggested_confounders, treatment=treatment, outcome=outcome, backdoor=suggested_backdoor, frontdoor=suggested_frontdoor, iv=suggested_iv, llm=gpt4)  
 ```
 
 
@@ -72,20 +76,16 @@ estimand = identifier.suggest_estimand(confounders=suggested_confounders, treatm
 
 ```python
 # Create instance of Validator
-validator = Validator()
+validator = ValidationSuggester('gpt-4')
 
-# Suggest a critique of the provided DAG
-suggested_critiques_dag = validator.critique_graph(graph=suggested_dag, llm=gpt4)
+# Suggest a critique of the edges in provided DAG
+suggested_critiques_dag = validator.critique_graph(all_factors, suggested_dag, domain_expertises, RelationshipStrategy.Pairwise)
 
 # Suggest latent confounders
-suggested_latent_confounders = validator.suggest_latent_confounders(treatment=treatment, outcome=outcome, llm=gpt4)
+suggested_latent_confounders = validator.suggest_latent_confounders(treatment, outcome, all_factors, domain_expertises)
 
 # Suggest negative controls
-suggested_negative_controls = validator.suggest_negative_controls(variables=selected_variables, treatment=treatment, outcome=outcome, llm=gpt4)
-
-plt.figure(figsize=(10, 5))
-nx.draw(suggested_critiques_dag, with_labels=True, node_color='lightblue')
-plt.show()
+suggested_negative_controls = validator.suggest_negative_controls(treatment, outcome, all_factors, domain_expertises)
 
 ```
 

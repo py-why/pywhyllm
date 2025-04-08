@@ -23,9 +23,9 @@ class ValidationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -39,16 +39,16 @@ class ValidationSuggester(IdentifierProtocol):
         negative_controls: List[str] = list()
 
         edited_factors_list: List[str] = []
-        for i in range(len(factors_list)):
-            if factors_list[i] != treatment and factors_list[i] != outcome:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != treatment and all_factors[i] != outcome:
+                edited_factors_list.append(all_factors[i])
 
         for expert in expert_list:
             negative_controls_counter,
             negative_controls_list = self.request_negative_controls(
                 treatment=treatment,
                 outcome=outcome,
-                factors_list=edited_factors_list,
+                all_factors=edited_factors_list,
                 negative_controls_counter=negative_controls_counter,
                 domain_expertise=expert,
                 analysis_context=analysis_context
@@ -63,10 +63,10 @@ class ValidationSuggester(IdentifierProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list(),
+            all_factors: list(),
             negative_controls_counter: list(),
             domain_expertise: str,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         negative_controls_list: List[str] = list()
 
@@ -84,7 +84,7 @@ class ValidationSuggester(IdentifierProtocol):
                     lm += cleandoc(prompt_str)
 
                 with user():
-                    prompt_str = f"""factor_names: {factors_list} From your perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
+                    prompt_str = f"""factor_names: {all_factors} From your perspective as an expert in the {domain_expertise}, what factor(s) from the list of factors, relevant to 
                              the {analysis_context}, should see zero treatment effect when changing the {treatment}? Which factor(s) 
                              from the list of factors, if any at all, relevant to the {analysis_context}, are negative controls on the 
                              causal mechanisms that affect the {outcome} when changing {treatment}? Using your domain knowledge, 
@@ -113,7 +113,7 @@ class ValidationSuggester(IdentifierProtocol):
                     for factor in negative_controls:
                         # to not add it twice into the list
                         if (
-                                factor in factors_list
+                                factor in all_factors
                                 and factor not in negative_controls_list
                         ):
                             negative_controls_list.append(factor)
@@ -135,7 +135,7 @@ class ValidationSuggester(IdentifierProtocol):
             treatment: str,
             outcome: str,
             expertise_list: list(),
-            analysis_context=CONTEXT,
+            analysis_context: str = CONTEXT,
             stakeholders: list() = None
     ):
         expert_list: List[str] = list()
@@ -169,7 +169,7 @@ class ValidationSuggester(IdentifierProtocol):
             outcome: str,
             latent_confounders_counter: list(),
             domain_expertise: str,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         latent_confounders_list: List[str] = list()
 
@@ -227,15 +227,15 @@ class ValidationSuggester(IdentifierProtocol):
     def request_parent_critique(
             self,
             factor,
-            factors_list,
+            all_factors,
             domain_expertise,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         edited_factors_list: List[str] = []
 
-        for i in range(len(factors_list)):
-            if factors_list[i] not in factor:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] not in factor:
+                edited_factors_list.append(all_factors[i])
 
         parents: List[str] = list()
 
@@ -250,10 +250,10 @@ class ValidationSuggester(IdentifierProtocol):
                     lm += cleandoc(prompt_str)
                 with user():
                     prompt_str = f"""Steps: (1) 
-                                Analyze potential factors [{factors_list}] for factors directly influencing/causing/affecting {
+                                Analyze potential factors [{all_factors}] for factors directly influencing/causing/affecting {
                     factor}. Is relationship direct? Ignore feedback mechanisms/factors not in list. Keep thoughts within 
                                 <thinking></thinking> tags. (2) Use prior thoughts to answer: how {factor} influenced/caused/affected by  [
-                                {factors_list}]? Is relationship direct? Ignore feedback mechanisms/factors not in list. Wrap 
+                                {all_factors}]? Is relationship direct? Ignore feedback mechanisms/factors not in list. Wrap 
                                 factors highly likely directly influencing/causing/affecting {factor} in 
                                 <influencing_factor></influencing_factor> tags. No tags for low likelihood factors. Ignore feedback 
                                 mechanisms/factors not in list. Answer as {domain_expertise} expert."""
@@ -280,15 +280,15 @@ class ValidationSuggester(IdentifierProtocol):
     def request_children_critique(
             self,
             factor,
-            factors_list,
+            all_factors,
             domain_expertise,
-            analysis_context=CONTEXT
+            analysis_context: str = CONTEXT
     ):
         edited_factors_list: List[str] = []
 
-        for i in range(len(factors_list)):
-            if factors_list[i] not in factor:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] not in factor:
+                edited_factors_list.append(all_factors[i])
 
         children: List[str] = list()
 
@@ -305,10 +305,10 @@ class ValidationSuggester(IdentifierProtocol):
 
                 with user():
                     prompt_str = f"""Steps: (
-                                1) Analyze potential factors [{factors_list}] for factors directly influenced/caused/affected by 
+                                1) Analyze potential factors [{all_factors}] for factors directly influenced/caused/affected by 
                                 {factor}. Is relationship direct? Ignore feedback mechanisms/factors not in list. Keep thoughts within 
                                 <thinking></thinking> tags. (2) Use prior thoughts to answer: how {factor} influences/causes/affects [{
-                    factors_list}]? Is relationship direct? Ignore feedback mechanisms/factors not in list. Wrap 
+                    all_factors}]? Is relationship direct? Ignore feedback mechanisms/factors not in list. Wrap 
                                 factors highly likely directly influenced/caused/affected by {factor} in 
                                 <influenced_factor></influenced_factor> tags. No tags for low likelihood factors. Ignore feedback 
                                 mechanisms/factors not in list. Answer as {domain_expertise} expert."""
@@ -389,10 +389,10 @@ class ValidationSuggester(IdentifierProtocol):
 
     def critique_graph(
             self,
-            factors_list: List[str],
+            all_factors: List[str],
             edges: Dict[Tuple[str, str], int],
             experts: list(),
-            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Parent,
+            relationship_strategy: RelationshipStrategy = RelationshipStrategy.Pairwise,
             analysis_context: str = CONTEXT,
             stakeholders: list() = None,
     ):
@@ -408,19 +408,19 @@ class ValidationSuggester(IdentifierProtocol):
 
             parent_edges: Dict[Tuple[str, str], int] = dict()
 
-            for factor in factors_list:
+            for factor in all_factors:
                 for expert in expert_list:
                     suggested_parent = self.request_parent_critique(
                         analysis_context=analysis_context,
                         factor=factor,
-                        factors_list=factors_list,
+                        all_factors=all_factors,
                         domain_expertise=expert
                     )
                     for element in suggested_parent:
                         if (
                                 element,
                                 factor,
-                        ) in parent_edges and element in factors_list:
+                        ) in parent_edges and element in all_factors:
                             parent_edges[(element, factor)] += 1
                         else:
                             parent_edges[(element, factor)] = 1
@@ -432,16 +432,16 @@ class ValidationSuggester(IdentifierProtocol):
 
             critiqued_children_edges: Dict[Tuple[str, str], int] = dict()
 
-            for factor in factors_list:
+            for factor in all_factors:
                 for expert in expert_list:
                     suggested_children = self.request_children_critique(
                         factor=factor,
-                        factors_list=factors_list,
+                        all_factors=all_factors,
                         domain_expertise=expert,
                         analysis_context=analysis_context
                     )
                     for element in suggested_children:
-                        if (element, factor) in critiqued_children_edges and element in factors_list:
+                        if (element, factor) in critiqued_children_edges and element in all_factors:
                             critiqued_children_edges[(element, factor)] += 1
                         else:
                             critiqued_children_edges[(element, factor)] = 1
@@ -453,7 +453,7 @@ class ValidationSuggester(IdentifierProtocol):
 
             critiqued_pairwise_edges: Dict[Tuple[str, str], int] = dict()
 
-            for (factor_a, factor_b) in itertools.combinations(factors_list, 2):
+            for (factor_a, factor_b) in itertools.combinations(all_factors, 2):
                 for expert in expert_list:
                     suggested_edge = self.request_pairwise_critique(
                         factor_a=factor_a,
