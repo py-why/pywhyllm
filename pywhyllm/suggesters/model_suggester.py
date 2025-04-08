@@ -17,7 +17,7 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_domain_expertises(
             self,
-            factors_list,
+            all_factors,
             n_experts: int = 1,
             analysis_context: str = CONTEXT
     ):
@@ -34,7 +34,7 @@ class ModelSuggester(ModelerProtocol):
                 with user():
                     prompt_str = f"""What domain expertises have the knowledge and experience needed to identify causal 
                     relationships and causal influences between the {analysis_context}? What domain expertises are needed 
-                    to work with and reason about the causal influence between {factors_list}? What domain expertises 
+                    to work with and reason about the causal influence between {all_factors}? What domain expertises 
                     have the knowledge and experience to reason and answer questions about influence and cause between 
                     such factors? Think about this in a step by step manner and recommend {n_experts} expertises and 
                     provide each one wrapped within the tags, <domain_expertise></domain_expertise>, along with the 
@@ -61,7 +61,7 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_domain_experts(
             self,
-            factors_list,
+            all_factors,
             n_experts: int = 5,
             analysis_context: str = CONTEXT
     ):
@@ -77,7 +77,7 @@ class ModelSuggester(ModelerProtocol):
                 with user():
                     prompt_str = f"""What domain experts have the knowledge and experience needed to identify causal relationships 
                     and causal influences between the {analysis_context}? What experts are needed to work with and 
-                    reason about the causal influence between {factors_list}? What domain experts have the knowledge 
+                    reason about the causal influence between {all_factors}? What domain experts have the knowledge 
                     and experience to reason and answer questions about influence and cause between such factors? Think 
                     about this in a step by step manner and recommend {n_experts} domain experts and provide each one 
                     wrapped within the tags, <domain_expert></domain_expert>, along with the reasoning and explanation 
@@ -104,7 +104,7 @@ class ModelSuggester(ModelerProtocol):
 
     def suggest_stakeholders(
             self,
-            factors_list,
+            all_factors,
             n_stakeholders: int = 5,  # must be > 1
             analysis_context: str = CONTEXT
     ):
@@ -122,7 +122,7 @@ class ModelSuggester(ModelerProtocol):
                 with user():
                     prompt_str = f"""What stakeholders have knowledge and experience in and about {analysis_context}? 
                 What stakeholders can work best with and reason well about the causal influence between 
-                {factors_list}? What stakeholders have the knowledge and experience useful to reason within this context? Think about 
+                {all_factors}? What stakeholders have the knowledge and experience useful to reason within this context? Think about 
                 this in a step by step manner and recommend {n_stakeholders} stakeholders. Then provide each useful stakeholder 
                 wrapped within the tags, <stakeholder></stakeholder>, along with the reasoning and explanation wrapped between the tags
                 <explanation></explanation>."""
@@ -152,7 +152,7 @@ class ModelSuggester(ModelerProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list,
+            all_factors: list,
             expertise_list: list,
             analysis_context: str = CONTEXT,
             stakeholders: list = None
@@ -170,9 +170,9 @@ class ModelSuggester(ModelerProtocol):
         confounders: List[str] = list()
 
         edited_factors_list: List[str] = []
-        for i in range(len(factors_list)):
-            if factors_list[i] != treatment and factors_list[i] != outcome:
-                edited_factors_list.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != treatment and all_factors[i] != outcome:
+                edited_factors_list.append(all_factors[i])
 
         for expert in expertise_list:
             confounders_edges, confounders_list = self.request_confounders(
@@ -180,7 +180,7 @@ class ModelSuggester(ModelerProtocol):
                 outcome=outcome,
                 analysis_context=analysis_context,
                 domain_expertise=expert,
-                factors_list=edited_factors_list,
+                all_factors=edited_factors_list,
                 confounders_edges=confounders_edges
             )
 
@@ -195,7 +195,7 @@ class ModelSuggester(ModelerProtocol):
             treatment,
             outcome,
             domain_expertise,
-            factors_list,
+            all_factors,
             confounders_edges,
             analysis_context: str = CONTEXT
     ):
@@ -229,7 +229,7 @@ class ModelSuggester(ModelerProtocol):
                 keep your 
                 thinking within two paragraphs. Then provide your step by step chain of thoughts within the tags 
                 <thinking></thinking>. \n factor_names : 
-                {factors_list} Wrap the name of the factor(s), if any at all, that has/have a high likelihood of directly influencing 
+                {all_factors} Wrap the name of the factor(s), if any at all, that has/have a high likelihood of directly influencing 
                 and causing both  the {treatment} and the {outcome}, within the tags 
                 <confounding_factor>factor_name</confounding_factor> where 
                 factor_name is one of the items within the factor_names list. If a factor does not have a high likelihood of directly 
@@ -244,7 +244,7 @@ class ModelSuggester(ModelerProtocol):
                 if confounding_factors:
                     for factor in confounding_factors:
                         # to not add it twice into the list
-                        if factor in factors_list and factor not in confounders:
+                        if factor in all_factors and factor not in confounders:
                             confounders.append(factor)
                 success = True
 
@@ -269,14 +269,14 @@ class ModelSuggester(ModelerProtocol):
             self,
             domain_expertise,
             factor,
-            factors_list,
+            all_factors,
             analysis_context: str = CONTEXT
     ):
         parent_candidates: List[str] = []
 
-        for i in range(len(factors_list)):
-            if factors_list[i] != factor:
-                parent_candidates.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != factor:
+                parent_candidates.append(all_factors[i])
 
         parents: List[str] = list()
 
@@ -303,7 +303,7 @@ class ModelSuggester(ModelerProtocol):
                             (2) From your perspective as an expert in {domain_expertise} which of the following 
                             factors has 
                             a high likelihood of directly influencing and causing the {factor}? factors list: [
-{factors_list}] 
+{all_factors}] 
                             For any factors within the list with a high likelihood of directly influencing and causing 
                             the {factor} wrap the name of the factor with the tags 
                             <influencing_factor>factor_name</influencing_factor>. 
@@ -335,15 +335,15 @@ class ModelSuggester(ModelerProtocol):
             self,
             domain_expertise,
             factor,
-            factors_list,
+            all_factors,
             analysis_context: str = CONTEXT
     ):
 
         children_candidates: List[str] = []
 
-        for i in range(len(factors_list)):
-            if factors_list[i] != factor:
-                children_candidates.append(factors_list[i])
+        for i in range(len(all_factors)):
+            if all_factors[i] != factor:
+                children_candidates.append(all_factors[i])
 
         children: List[str] = list()
 
@@ -373,7 +373,7 @@ class ModelSuggester(ModelerProtocol):
                             list, 
                             if any at all, has/have a high likelihood of being directly influenced and caused by the {factor}? What 
                             factor(
-                            s) from the factors list, if any at all, is/are affected by the {factor}? factors list: [{factors_list}] 
+                            s) from the factors list, if any at all, is/are affected by the {factor}? factors list: [{all_factors}] 
                             For 
                             any factors within the list with a high likelihood of being directly influenced and caused by the {factor}, 
                             wrap the name of the factor with the tags <influenced_factor>factor_name</influenced_factor>. If a factor 
@@ -467,7 +467,7 @@ class ModelSuggester(ModelerProtocol):
             self,
             treatment: str,
             outcome: str,
-            factors_list: list,
+            all_factors: list,
             expertise_list: list,
             relationship_strategy: RelationshipStrategy = RelationshipStrategy.Pairwise,
             analysis_context: str = CONTEXT,
@@ -483,19 +483,19 @@ class ModelSuggester(ModelerProtocol):
         if relationship_strategy == RelationshipStrategy.Parent:
             "loop asking parents program"
             parent_edges: Dict[Tuple[str, str], int] = dict()
-            for factor in factors_list:
+            for factor in all_factors:
                 for expert in expert_list:
                     suggested_parent = self.suggest_parents(
                         domain_expertise=expert,
                         factor=factor,
-                        factors_list=factors_list,
+                        all_factors=all_factors,
                         analysis_context=analysis_context
                     )
                     for element in suggested_parent:
                         if (
                                 element,
                                 factor,
-                        ) in parent_edges and element in factors_list:
+                        ) in parent_edges and element in all_factors:
                             parent_edges[(element, factor)] += 1
                         else:
                             parent_edges[(element, factor)] = 1
@@ -507,19 +507,19 @@ class ModelSuggester(ModelerProtocol):
 
             children_edges: Dict[Tuple[str, str], int] = dict()
 
-            for factor in factors_list:
+            for factor in all_factors:
                 for expert in expert_list:
                     suggested_children = self.suggest_children(
                         domain_expertise=expert,
                         factor=factor,
-                        factors_list=factors_list,
+                        all_factors=all_factors,
                         analysis_context=analysis_context
                     )
                     for element in suggested_children:
                         if (
                                 element,
                                 factor,
-                        ) in children_edges and element in factors_list:
+                        ) in children_edges and element in all_factors:
                             children_edges[(element, factor)] += 1
                         else:
                             children_edges[(element, factor)] = 1
@@ -531,7 +531,7 @@ class ModelSuggester(ModelerProtocol):
 
             pairwise_edges: Dict[Tuple[str, str], int] = dict()
 
-            for (factor_a, factor_b) in itertools.combinations(factors_list, 2):
+            for (factor_a, factor_b) in itertools.combinations(all_factors, 2):
                 for expert in expert_list:
                     suggested_edge = self.suggest_pairwise_relationship(
                         domain_expertise=expert,
@@ -554,7 +554,7 @@ class ModelSuggester(ModelerProtocol):
             confounders_counter, confounders = self.suggest_confounders(
                 treatment=treatment,
                 outcome=outcome,
-                factors_list=factors_list,
+                all_factors=all_factors,
                 expertise_list=expertise_list,
                 analysis_context=analysis_context
             )
