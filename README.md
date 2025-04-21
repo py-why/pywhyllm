@@ -10,7 +10,7 @@ PyWhy-LLM is an innovative library designed to augment human expertise by seamle
 
 ## Documentation and Tutorials
 
-For detailed usage instructions and tutorials, refer to [Notebook](link_here).
+For detailed usage instructions and tutorials, refer to [Walkthrough Notebook](https://github.com/py-why/pywhyllm/blob/main/docs/notebooks/walkthrough.ipynb) and [Examples Notebook](https://github.com/py-why/pywhyllm/blob/main/docs/notebooks/examples.ipynb).
 
 ## Installation
 
