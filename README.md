@@ -92,4 +92,4 @@ suggested_negative_controls = validator.suggest_negative_controls(treatment, out
 ## Contributors ✨
 This project welcomes contributions and suggestions. For a guide to contributing and a list of all contributors, check out [CONTRIBUTING.md](https://github.com/py-why/pywhyllm/blob/main/CONTRIBUTING.md>). Our contributor code of conduct is available [here](https://github.com/py-why/governance/blob/main/CODE-OF-CONDUCT.md>).
 
-If you encounter an issue or have a specific request for DoWhy, please [raise an issue](https://github.com/py-why/pywhyllm/issues).
+If you encounter an issue or have a specific request for PyWhy-LLM, please [raise an issue](https://github.com/py-why/pywhyllm/issues).
