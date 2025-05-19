@@ -24,7 +24,7 @@ def find_top_match_in_causenet(self, variable1, variable2):
     bm25 = BM25Okapi(tokenized_pairs)
 
     # Query
-    query = variable1
+    query = variable1 + "-" + variable2
     tokenized_query = query.split()
 
     # Get top-k candidates using BM25
