@@ -6,7 +6,7 @@ from pywhyllm.utils.augmented_model_suggester_utils import *
 
 
 class AugmentedModelSuggester(SimpleModelSuggester):
-    def __init__(self, file_path: str = 'data/causenet-precision.jsonl.bz2'):
+    def __init__(self, llm, file_path: str = 'data/causenet-precision.jsonl.bz2'):
         super().__init__()
         self.file_path = file_path
 
