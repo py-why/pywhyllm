@@ -55,11 +55,11 @@ class SimpleModelSuggester:
         answer = [ans.strip() for ans in answer]
         answer_str = "".join(answer)
 
-        if (answer_str == "A"):
+        if answer_str == "A":
             return [variable1, variable2, description]
-        elif (answer_str == "B"):
+        elif answer_str == "B":
             return [variable2, variable1, description]
-        elif (answer_str == "C"):
+        elif answer_str == "C":
             return [None, None, description]  # maybe we want to save the description in this case too
         else:
             assert False, "Invalid answer from LLM: " + answer_str

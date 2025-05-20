@@ -55,6 +55,14 @@ networkx = "<=3.2.1"
 guidance = ">=0.2"
 openai = ">=1.70"
 pydantic = ">=2.11"
+langchain = ">=0.3.25"
+langchain-chroma = ">=0.2.4"
+langchain-community = ">=0.3.24"
+langchain-core = ">=0.3.60"
+langchain-huggingface = ">=0.2.0"
+langchain-openai = ">=0.3.17"
+rank-bm25 = ">=0.2.2"
+sentence-transformers = ">=4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.33.0"
@@ -110,7 +118,7 @@ _isort_check = 'isort --check .'
 
 # testing tasks
 test = "pytest -v -m 'not advanced' --durations=0 --durations-min=60.0"
-test_no_notebooks= "pytest -v -m 'not advanced and not notebook' --durations=0 --durations-min=60.0"
+test_no_notebooks = "pytest -v -m 'not advanced and not notebook' --durations=0 --durations-min=60.0"
 test_durations = "poetry run poe test --store-durations"
 test_advanced = "pytest -v"
 test_focused = "pytest -v -m 'focused'"
