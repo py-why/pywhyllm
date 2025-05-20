@@ -12,12 +12,11 @@ from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer, util
 
 
-def find_top_match_in_causenet(self, variable1, variable2):
+def find_top_match_in_causenet(causenet_dict, variable1, variable2):
     # Sample dictionary
     pair_strings = [
-        f"{self.causenet_dict[key]['causal_relation']['cause']}-{self.causenet_dict[key]['causal_relation']['effect']}"
-        for
-        key in self.causenet_dict]
+        f"{causenet_dict[key]['causal_relation']['cause']}-{causenet_dict[key]['causal_relation']['effect']}"
+        for key in causenet_dict]
 
     # Tokenize for BM25
     tokenized_pairs = [text.split() for text in pair_strings]
@@ -40,8 +39,8 @@ def find_top_match_in_causenet(self, variable1, variable2):
     similarities = util.cos_sim(query_embedding, candidate_embeddings).flatten()
     top_idx = top_k_indices[np.argmax(similarities)]
     top_pair = pair_strings[top_idx]
-    print(top_pair)
-    result = self.causenet_dict[top_pair]
+    print(f"Best match: {top_pair}")
+    result = causenet_dict[top_pair]
     return result
 
 
@@ -66,9 +65,6 @@ def split_data_and_create_vectorstore_retriever(source_text):
     # Split the documents
     splits = text_splitter.split_documents([document])
 
-    # Verify the number of chunks
-    print(f"Number of chunks: {len(splits)}")
-
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     # Create a vector store from the document splits
@@ -87,7 +83,7 @@ def split_data_and_create_vectorstore_retriever(source_text):
     return retriever
 
 
-def query_llm(source_text, variable1, variable2, retriever=None):
+def query_llm(source_text, variable1, variable2, retriever):
     # Initialize the language model
     llm = ChatOpenAI(model="gpt-4")
 
@@ -106,7 +102,8 @@ def query_llm(source_text, variable1, variable2, retriever=None):
         ("human", "{input}")
     ])
 
-    query = variable1 + "-" + variable2
+    query = f"""Which cause-and-effect-relationship is more likely? Provide reasoning and you must give your final answer (A, B, or C) in <answer> </answer> tags with the letter only.
+            A. {variable1} causes {variable2} B. {variable2} causes {variable1} C. neither {variable1} nor {variable2} cause each other."""
 
     # Define the system prompt
     if source_text:

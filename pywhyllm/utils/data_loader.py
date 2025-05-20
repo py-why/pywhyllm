@@ -99,5 +99,5 @@ def create_causenet_dict(json_data):
         else:
             # Append sources to existing list
             causenet_dict[key]['sources'].extend(item['sources'])
-        print("Done creating dictionary from CauseNet json data")
+    print("Done creating dictionary from CauseNet json data")
     return causenet_dict
