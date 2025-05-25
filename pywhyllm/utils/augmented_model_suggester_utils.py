@@ -12,7 +12,7 @@ from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer, util
 
 
-def find_top_match_in_causenet(causenet_dict, variable1, variable2):
+def find_top_match_in_causenet(causenet_dict, variable1, variable2, threshold=0.7):
     # Sample dictionary
     pair_strings = [
         f"{causenet_dict[key]['causal_relation']['cause']}-{causenet_dict[key]['causal_relation']['effect']}"
@@ -22,34 +22,54 @@ def find_top_match_in_causenet(causenet_dict, variable1, variable2):
     tokenized_pairs = [text.split() for text in pair_strings]
     bm25 = BM25Okapi(tokenized_pairs)
 
-    # Query
+    # Original and reverse queries
     query = variable1 + "-" + variable2
+    reverse_query = variable2 + "-" + variable1
     tokenized_query = query.split()
+    tokenized_reverse_query = reverse_query.split()
 
-    # Get top-k candidates using BM25
+    # Combine tokens from both queries (remove duplicates)
+    combined_query = list(set(tokenized_query + tokenized_reverse_query))
+
+    # Get top-k candidates using BM25 with combined query
     k = 5
-    scores = bm25.get_scores(tokenized_query)
+    scores = bm25.get_scores(combined_query)
     top_k_indices = np.argsort(scores)[::-1][:k]
     candidate_pairs = [pair_strings[i] for i in top_k_indices]
 
     # Apply SBERT to candidates
     model = SentenceTransformer('all-MiniLM-L6-v2')
     query_embedding = model.encode(query, convert_to_tensor=True)
+    reverse_query_embedding = model.encode(reverse_query, convert_to_tensor=True)
     candidate_embeddings = model.encode(candidate_pairs, convert_to_tensor=True)
+
+    # Compute similarities for both original and reverse queries
     similarities = util.cos_sim(query_embedding, candidate_embeddings).flatten()
-    top_idx = top_k_indices[np.argmax(similarities)]
-    top_pair = pair_strings[top_idx]
-    print(f"Best match: {top_pair}")
-    result = causenet_dict[top_pair]
-    return result
+    reverse_similarities = util.cos_sim(reverse_query_embedding, candidate_embeddings).flatten()
+
+    # Take the maximum similarity for each candidate (original or reverse)
+    max_similarities = np.maximum(similarities, reverse_similarities)
+
+    # Get the top match and its similarity score
+    top_idx = np.argmax(max_similarities)
+    top_similarity = max_similarities[top_idx]
+    top_pair = candidate_pairs[top_idx]
+
+    # Check if the top similarity meets the threshold
+    if top_similarity >= threshold:
+        print(f"Best match: {top_pair} (Similarity: {top_similarity:.4f})")
+        return causenet_dict[top_pair]
+    else:
+        print(f"No match found with similarity above {threshold} (Best similarity: {top_similarity:.4f})")
+        return None
 
 
 def get_source_text(causenet_query_result):
     source_text = ""
-
-    for item in causenet_query_result["sources"]:
-        if item["type"] == 'wikipedia_sentence' or item["type"] == 'clueweb12_sentence':
-            source_text += item["payload"]["sentence"] + " "
+    if causenet_query_result:
+        for item in causenet_query_result["sources"]:
+            if item["type"] == 'wikipedia_sentence' or item["type"] == 'clueweb12_sentence':
+                source_text += item["payload"]["sentence"] + " "
 
     return source_text
 
@@ -83,7 +103,7 @@ def split_data_and_create_vectorstore_retriever(source_text):
     return retriever
 
 
-def query_llm(source_text, variable1, variable2, retriever):
+def query_llm(variable1, variable2, source_text=None, retriever=None):
     # Initialize the language model
     llm = ChatOpenAI(model="gpt-4")
 

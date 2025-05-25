@@ -24,9 +24,12 @@ class AugmentedModelSuggester(SimpleModelSuggester):
 
     def suggest_pairwise_relationship(self, variable1: str, variable2: str):
         result = find_top_match_in_causenet(self.causenet_dict, variable1, variable2)
-        source_text = get_source_text(result)
-        retriever = split_data_and_create_vectorstore_retriever(source_text)
-        response = query_llm(source_text, variable1, variable2, retriever)
+        if result:
+            source_text = get_source_text(result)
+            retriever = split_data_and_create_vectorstore_retriever(source_text)
+            response = query_llm(variable1, variable2, source_text, retriever)
+        else:
+            response = query_llm(variable1, variable2)
 
         answer = re.findall(r'<answer>(.*?)</answer>', response)
         answer = [ans.strip() for ans in answer]
