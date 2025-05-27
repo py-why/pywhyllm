@@ -49,11 +49,22 @@ domain_expertises = modeler.suggest_domain_expertises(all_factors)
 # Suggest a set of potential confounders
 suggested_confounders = modeler.suggest_confounders(treatment, outcome, all_factors, domain_expertises)
 
-# Suggest pair-wise relationship between variables
+# Suggest pair-wise relationships between variables
 suggested_dag = modeler.suggest_relationships(treatment, outcome, all_factors, domain_expertises, RelationshipStrategy.Pairwise)
 ```
 
+### Retrieval Augmented Generation (RAG)-based Modeler
 
+```python
+# Create instance of Modeler
+modeler = ModelSuggester('gpt-4')
+
+treatment = "smoking"
+outcome = "lung cancer"
+
+# Suggest pair-wise relationship between two given variables, utilizing CauseNet for RAG
+suggested_relationship = modeler.suggest_relationships(treatment, outcome)
+```
 
 ### Identifier
 
