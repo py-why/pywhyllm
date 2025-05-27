@@ -63,7 +63,7 @@ treatment = "smoking"
 outcome = "lung cancer"
 
 # Suggest pair-wise relationship between two given variables, utilizing CauseNet for RAG
-suggested_dag = modeler.suggest_relationships(treatment, outcome)
+suggested_relationship = modeler.suggest_relationships(treatment, outcome)
 ```
 
 ### Identifier
