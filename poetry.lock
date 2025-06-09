@@ -3191,23 +3191,6 @@ tokenizers = ">=0.19.1"
 transformers = ">=4.39.0"
 
 [[package]]
-name = "langchain-openai"
-version = "0.3.17"
-description = "An integration package connecting OpenAI and LangChain"
-optional = false
-python-versions = ">=3.9"
-groups = ["main"]
-files = [
-    {file = "langchain_openai-0.3.17-py3-none-any.whl", hash = "sha256:d4d9cf945e2453ee5895ccd12fd8a3ea9131a0f6130dcc21427c77cc2206b1c0"},
-    {file = "langchain_openai-0.3.17.tar.gz", hash = "sha256:10bcdfac3edb3dea4a8aabb12f01566e5ff8756634cc52aa169c62e4c4b73801"},
-]
-
-[package.dependencies]
-langchain-core = ">=0.3.59,<1.0.0"
-openai = ">=1.68.2,<2.0.0"
-tiktoken = ">=0.7,<1"
-
-[[package]]
 name = "langchain-text-splitters"
 version = "0.3.8"
 description = "LangChain text splitting utilities"
@@ -8302,4 +8285,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.13"
-content-hash = "7df57195228a809f02db9ffdaa2198d35de649ba58f56f9c0704b1e0e12bc44c"
+content-hash = "6240737c89e0178464a3a83c9123160e79be6c2984019f63ab17b1daf30d851d"

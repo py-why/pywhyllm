@@ -20,7 +20,9 @@ def download_causenet(url: str, file_path: str) -> bool:
     International Conference on Information &amp; Knowledge Management (CIKM '20). Association for
     Computing Machinery, New York, NY, USA, 3023–3030. https://doi.org/10.1145/3340531.3412763
 
-    TODO: Add license
+    License:
+    CauseNet data is licensed under the Creative Commons Attribution (CC BY) license.
+    For full license details, see: https://creativecommons.org/licenses/by/4.0/
 
     Args:
         url (str): The URL of the file to download.
@@ -30,21 +32,16 @@ def download_causenet(url: str, file_path: str) -> bool:
         bool: True if the download was successful, False otherwise.
     """
     try:
-        # Ensure the output directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        # Send a GET request to the URL
         response = requests.get(url, stream=True)
 
-        # Check if the request was successful
         if response.status_code != 200:
             logging.error(f"Failed to download file from {url}. Status code: {response.status_code}")
             return False
 
-        # Get the total file size for progress bar (if available)
         total_size = int(response.headers.get("content-length", 0))
 
-        # Download and save the file with a progress bar
         with open(file_path, "wb") as file, tqdm(
                 desc="Downloading",
                 total=total_size,
@@ -73,12 +70,11 @@ def load_causenet_json(file_path):
     print("Loading CauseNet using json")
     with bz2.open(file_path, 'rt',
                   encoding='utf-8') as file:
-        # Read each line and parse as JSON
         for line in file:
-            line = line.strip()  # Remove trailing newlines
-            if line:  # Skip empty lines
-                json_obj = json.loads(line)  # Parse the line as JSON
-                json_data.append(json_obj)  # Add to list
+            line = line.strip()
+            if line:
+                json_obj = json.loads(line)
+                json_data.append(json_obj)
     print("Done loading CauseNet using json")
     return json_data
 
@@ -97,7 +93,6 @@ def create_causenet_dict(json_data):
                 'sources': item['sources']
             }
         else:
-            # Append sources to existing list
             causenet_dict[key]['sources'].extend(item['sources'])
     print("Done creating dictionary from CauseNet json data")
     return causenet_dict
