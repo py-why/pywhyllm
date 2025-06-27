@@ -57,9 +57,9 @@ class AugmentedModelSuggester(SimpleModelSuggester):
         if result:
             source_text = get_source_text(result)
             retriever = split_data_and_create_vectorstore_retriever(source_text)
-            response = query_llm(self.llm, variable1, variable2, source_text, retriever)
+            response = query_llm(variable1, variable2, source_text, retriever)
         else:
-            response = query_llm(self.llm, variable1, variable2)
+            response = query_llm(variable1, variable2)
 
         answer = re.findall(r'<answer>(.*?)</answer>', response)
         answer = [ans.strip() for ans in answer]
