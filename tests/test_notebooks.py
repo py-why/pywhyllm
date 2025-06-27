@@ -15,7 +15,7 @@ advanced_notebooks = {
 ignore_notebooks = [
     # notebooks that require openai key to run
     "examples.ipynb",
-    "walkthrough.ipynb"
+    "walkthrough.ipynb",
     "augmented_model_suggester_examples.ipynb"
 ]
 
