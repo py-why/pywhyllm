@@ -2,6 +2,7 @@ import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
+from langchain_openai import OpenAI
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
@@ -88,7 +89,8 @@ def split_data_and_create_vectorstore_retriever(source_text):
     return retriever
 
 
-def query_llm(llm, variable1, variable2, source_text=None, retriever=None):
+def query_llm(variable1, variable2, source_text=None, retriever=None):
+    llm = OpenAI()
     if source_text:
         system_prompt = """You are a helpful assistant for causal reasoning.
 
@@ -117,4 +119,4 @@ def query_llm(llm, variable1, variable2, source_text=None, retriever=None):
     else:
         default_chain = prompt | llm
         response = default_chain.invoke({"input": query})
-        return response.content
+        return response
