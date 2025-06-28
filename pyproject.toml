@@ -50,6 +50,7 @@ files = ["pywhyllm/__init__.py"]
 #
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
+onnxruntime = ">=1.18.0,<1.21.0"
 # to support python 3.9 with networkx
 networkx = "<=3.2.1"
 guidance = ">=0.2"
