@@ -4383,28 +4383,6 @@ protobuf = "*"
 sympy = "*"
 
 [[package]]
-name = "onnxruntime-silicon"
-version = "1.16.3"
-description = "ONNX Runtime is a runtime accelerator for Machine Learning models"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "onnxruntime_silicon-1.16.3-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:ee64534c5a8a95a19ac25f0f372da91541fd9f516d7ffd7a6e56117cf44a899b"},
-    {file = "onnxruntime_silicon-1.16.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:9f519f3e6dacfd26083aed0a3eda79c933fd7d93e435ffc58c8c111fe66d5f00"},
-    {file = "onnxruntime_silicon-1.16.3-cp38-cp38-macosx_14_0_arm64.whl", hash = "sha256:1e0b0ec2b42fc809af15e995acebfbfc69f53356d45adc3dc9c0af20256055c2"},
-    {file = "onnxruntime_silicon-1.16.3-cp39-cp39-macosx_14_0_arm64.whl", hash = "sha256:66f846d31a792f7b9cb834e82d095d160096bf070b4b527d08faf4fd36bfd735"},
-]
-
-[package.dependencies]
-coloredlogs = "*"
-flatbuffers = "*"
-numpy = ">=1.22.3"
-packaging = "*"
-protobuf = "*"
-sympy = "*"
-
-[[package]]
 name = "openai"
 version = "1.93.0"
 description = "The official Python library for the openai API"
@@ -8256,4 +8234,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.13"
-content-hash = "777ebb46fdd00c5e3e8328f4a0080065ac35c46bf36d06b708234738bade9122"
+content-hash = "469c9166d82aa6ee0eeaeae949d156cc3fec42d95fce250605f6e46fb950cb9f"
