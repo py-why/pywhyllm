@@ -28,6 +28,7 @@ PyWhy-LLM seamlessly integrates into your existing causal inference process. Imp
 from pywhyllm.suggesters.model_suggester import ModelSuggester 
 from pywhyllm.suggesters.identification_suggester import IdentificationSuggester
 from pywhyllm.suggesters.validation_suggester import ValidationSuggester
+from pywhyllm.suggesters.augmented_model_suggester import AugmentedModelSuggester
 from pywhyllm import RelationshipStrategy
 
 ```
@@ -49,11 +50,22 @@ domain_expertises = modeler.suggest_domain_expertises(all_factors)
 # Suggest a set of potential confounders
 suggested_confounders = modeler.suggest_confounders(treatment, outcome, all_factors, domain_expertises)
 
-# Suggest pair-wise relationship between variables
+# Suggest pair-wise relationships between variables
 suggested_dag = modeler.suggest_relationships(treatment, outcome, all_factors, domain_expertises, RelationshipStrategy.Pairwise)
 ```
 
+### Retrieval Augmented Generation (RAG)-based Modeler
 
+```python
+# Create instance of Modeler
+modeler = AugmentedModelSuggester('gpt-4')
+
+treatment = "smoking"
+outcome = "lung cancer"
+
+# Suggest pair-wise relationship between two given variables, utilizing CauseNet for RAGing the LLM
+suggested_relationship = modeler.suggest_relationships(treatment, outcome)
+```
 
 ### Identifier
 
