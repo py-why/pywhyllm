@@ -22,8 +22,12 @@ class SimpleModelSuggester:
 
     def __init__(self, llm=None):
         if llm is not None:
-            if (llm == 'gpt-4'):
+            if llm == 'gpt-4':
                 self.llm = guidance.models.OpenAI('gpt-4')
+            elif isinstance(llm, guidance.models.Model):
+                self.llm = llm
+            else:
+                raise ValueError("llm must be either 'gpt-4' or a guidance model instance.")
 
     # new ver
     def suggest_pairwise_relationship(self, variable1: str, variable2: str):
