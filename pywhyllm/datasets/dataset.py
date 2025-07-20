@@ -25,7 +25,6 @@ class Dataset(Protocol):
         """
         Generate synthetic data based on the dataset's causal graph.
 
-        Args:
         Returns:
             A numpy array containing the synthetic data
         """
