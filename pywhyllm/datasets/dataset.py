@@ -16,7 +16,6 @@ class Dataset(Protocol):
         """
         Output the data associated with the dataset.
 
-        Args:
         Returns:
             A numpy array containing the data
         """
