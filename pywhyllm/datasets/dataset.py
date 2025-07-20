@@ -6,7 +6,6 @@ class Dataset(Protocol):
         """
         Output the graph associated with the dataset. 
 
-        Args:
         Returns:
             A networkx graph 
         """
