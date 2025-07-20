@@ -18,7 +18,7 @@ def recall(edges, true_edges):
     pass
 
 
-def F1(edges, true_edges)
+def F1(edges, true_edges):
     """F1 metric for predicted edges
     """
     pass
