@@ -63,7 +63,7 @@ langchain-openai = "0.3.26"
 langchain-huggingface = ">=0.2.0"
 rank-bm25 = ">=0.2.2"
 sentence-transformers = ">=4.1.0"
-onnxruntime = "1.16.3"
+onnxruntime = "1.20.1"
 multidict = "^6.6.3"
 
 [tool.poetry.group.dev.dependencies]
