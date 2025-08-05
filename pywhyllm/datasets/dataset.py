@@ -4,7 +4,7 @@ class Dataset(Protocol):
     
     def graph(self):
         """
-        Output the graph associated with the dataset. 
+        Output the ground truth graph associated with the dataset. 
 
         Returns:
             A networkx graph 
@@ -20,11 +20,3 @@ class Dataset(Protocol):
         """
         pass
 
-    def generate_data(self):
-        """
-        Generate synthetic data based on the dataset's causal graph.
-
-        Returns:
-            A numpy array containing the synthetic data
-        """
-        pass
