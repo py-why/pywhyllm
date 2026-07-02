@@ -195,6 +195,44 @@ class TestModelSuggesterNegativeControls(unittest.IsolatedAsyncioTestCase):
         self.assertIn("age", result)
         self.assertNotIn("not_in_list", result)
 
+    async def test_suggest_negative_controls_deduplicates_across_experts(self):
+        modeler, mock_client = _make_modeler()
+        mock_client.chat.completions.create.return_value = NegativeControlsResponse(
+            negative_controls=["age"]
+        )
+        result = await modeler.suggest_negative_controls(
+            "smoking", "lung_cancer", VARIABLES,
+            expertise_list=["oncologist", "epidemiologist"],
+        )
+        self.assertEqual(result.count("age"), 1)
+        self.assertEqual(mock_client.chat.completions.create.call_count, 2)
+
+
+class TestModelSuggesterTemperature(unittest.IsolatedAsyncioTestCase):
+
+    async def test_temperature_passed_in_api_call(self):
+        """When temperature is set it must appear in every create() call."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=CausalGraphResponse(edges=[])
+        )
+        modeler = ModelSuggester(client=mock_client, temperature=0.0)
+        await modeler.suggest_graph(VARIABLES)
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertIn("temperature", call_kwargs)
+        self.assertEqual(call_kwargs["temperature"], 0.0)
+
+    async def test_no_temperature_omits_key(self):
+        """Default (temperature=None) must NOT include temperature in the call."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=CausalGraphResponse(edges=[])
+        )
+        modeler = ModelSuggester(client=mock_client)
+        await modeler.suggest_graph(VARIABLES)
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertNotIn("temperature", call_kwargs)
+
 
 class TestModelSuggesterValidation(unittest.IsolatedAsyncioTestCase):
 
@@ -225,3 +263,17 @@ class TestModelSuggesterValidation(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(mock_client.chat.completions.create.call_count, 2)
         self.assertIsInstance(critique, CausalGraph)
+
+    async def test_critique_graph_min_confidence(self):
+        """Edges below min_confidence should not appear in critique result."""
+        modeler, mock_client = _make_modeler()
+        original = CausalGraph.from_responses([_graph_response(("smoking", "lung_cancer"))])
+        mock_client.chat.completions.create.return_value = CausalGraphResponse(
+            edges=[
+                CausalEdge(cause="smoking", effect="lung_cancer", confidence=0.9, reasoning="strong"),
+                CausalEdge(cause="lung_cancer", effect="smoking", confidence=0.05, reasoning="noise"),
+            ]
+        )
+        critique = await modeler.critique_graph(original, VARIABLES)
+        self.assertIn(("smoking", "lung_cancer"), critique.edges)
+        self.assertNotIn(("lung_cancer", "smoking"), critique.edges)
