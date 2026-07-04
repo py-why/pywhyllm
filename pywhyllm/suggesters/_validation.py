@@ -1,6 +1,7 @@
 import asyncio
 
 from .causal_graph import CausalGraph
+from ._prompts import critique_messages
 from .response_models import CausalGraphResponse
 
 
@@ -8,7 +9,7 @@ class ValidationMixin:
     """
     Causal validation methods — critiquing an existing graph.
 
-    Relies on ``self.client``, ``self.model``, and ``self.context``
+    Relies on ``self.client``, ``self.context``, and ``self._api_kwargs``
     provided by ``ModelSuggester.__init__``.
     """
 
@@ -55,10 +56,9 @@ class ValidationMixin:
             A new graph containing edges the critique considers valid,
             plus any new edges it suggests.
         """
-        edge_descriptions = [
+        edge_block = "\n".join(
             f"  {cause} → {effect}" for (cause, effect) in graph.edges
-        ]
-        edge_block = "\n".join(edge_descriptions)
+        )
 
         if not expertise_list:
             response = await self._critique_call(variables, edge_block, expertise=None)
@@ -76,28 +76,8 @@ class ValidationMixin:
         edge_block: str,
         expertise: str | None,
     ) -> CausalGraphResponse:
-        system = (
-            f"You are an expert in {expertise} studying {self.context}. "
-            f"You are reviewing a proposed causal model for correctness."
-            if expertise
-            else f"You are a helpful assistant reviewing a proposed causal model about {self.context}."
-        )
         return await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=CausalGraphResponse,
-            messages=[
-                {"role": "system", "content": system},
-                {
-                    "role": "user",
-                    "content": (
-                        f"A causal model has been proposed with these variables: {variables}\n\n"
-                        f"The proposed causal edges are:\n{edge_block}\n\n"
-                        f"Review each edge. Think step by step about whether each represents "
-                        f"a valid, direct causal relationship. "
-                        f"Return only the edges you believe are correct. "
-                        f"Also add any direct causal edges you believe are missing. "
-                        f"Do not include indirect relationships or feedback loops."
-                    ),
-                },
-            ],
+            messages=critique_messages(variables, edge_block, self.context, expertise),
         )

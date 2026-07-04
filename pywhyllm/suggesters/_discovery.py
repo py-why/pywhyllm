@@ -1,6 +1,12 @@
 import asyncio
 
 from .causal_graph import CausalGraph
+from ._prompts import (
+    graph_messages,
+    domain_experts_messages,
+    domain_expertises_messages,
+    stakeholders_messages,
+)
 from .response_models import (
     CausalGraphResponse,
     DomainExpertsResponse,
@@ -13,8 +19,8 @@ class DiscoveryMixin:
     """
     Causal discovery methods — building the graph and recommending experts.
 
-    Relies on ``self.client``, ``self.model``, and ``self.context``
-    provided by ``ModelSuggester.__init__``.
+    Relies on ``self.client``, ``self.model``, ``self.context``, and
+    ``self._api_kwargs`` provided by ``ModelSuggester.__init__``.
     """
 
     async def suggest_graph(
@@ -62,28 +68,10 @@ class DiscoveryMixin:
         variables: list[str],
         expertise: str | None,
     ) -> CausalGraphResponse:
-        system = (
-            f"You are an expert in {expertise} studying {self.context}. "
-            f"You are building a causal model that describes the causal mechanisms of this system."
-            if expertise
-            else f"You are a helpful assistant for causal reasoning about {self.context}."
-        )
         return await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=CausalGraphResponse,
-            messages=[
-                {"role": "system", "content": system},
-                {
-                    "role": "user",
-                    "content": (
-                        f"Given these variables: {variables}\n\n"
-                        f"Identify all direct causal relationships between them. "
-                        f"Think step by step. Only include relationships with a high likelihood "
-                        f"of being directly causally true. "
-                        f"Do not include indirect relationships or feedback loops."
-                    ),
-                },
-            ],
+            messages=graph_messages(variables, self.context, expertise),
         )
 
     # ------------------------------------------------------------------
@@ -99,20 +87,7 @@ class DiscoveryMixin:
         response = await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=DomainExpertsResponse,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant for recommending domain experts.",
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"What domain experts have the knowledge and experience needed to identify "
-                        f"causal relationships between: {variables}? "
-                        f"Think step by step and recommend {n_experts} domain experts."
-                    ),
-                },
-            ],
+            messages=domain_experts_messages(variables, n_experts),
         )
         return response.experts[:n_experts]
 
@@ -125,20 +100,7 @@ class DiscoveryMixin:
         response = await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=DomainExpertisesResponse,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant for recommending domain expertises.",
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"What domain expertises are needed to identify causal relationships "
-                        f"between: {variables}? "
-                        f"Think step by step and recommend {n_experts} expertises."
-                    ),
-                },
-            ],
+            messages=domain_expertises_messages(variables, n_experts),
         )
         return response.expertises[:n_experts]
 
@@ -151,19 +113,6 @@ class DiscoveryMixin:
         response = await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=StakeholdersResponse,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant for recommending stakeholders.",
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"What stakeholders have knowledge and experience relevant to "
-                        f"causal relationships between: {variables}? "
-                        f"Think step by step and recommend {n_stakeholders} stakeholders."
-                    ),
-                },
-            ],
+            messages=stakeholders_messages(variables, n_stakeholders),
         )
         return response.stakeholders[:n_stakeholders]

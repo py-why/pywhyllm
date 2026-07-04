@@ -1,5 +1,10 @@
 import asyncio
 
+from ._prompts import (
+    confounders_messages,
+    latent_confounders_messages,
+    negative_controls_messages,
+)
 from .response_models import (
     ConfoundingFactorsResponse,
     LatentConfoundersResponse,
@@ -11,7 +16,7 @@ class IdentificationMixin:
     """
     Causal identification methods — confounders, negative controls.
 
-    Relies on ``self.client``, ``self.model``, and ``self.context``
+    Relies on ``self.client``, ``self.context``, and ``self._api_kwargs``
     provided by ``ModelSuggester.__init__``.
     """
 
@@ -70,43 +75,23 @@ class IdentificationMixin:
         expertise: str | None,
         latent: bool,
     ) -> list[str]:
-        system = (
-            f"You are an expert in {expertise} studying {self.context}."
-            if expertise
-            else "You are a helpful assistant for causal reasoning."
-        )
-
         if latent:
-            user_content = (
-                f"What latent (unmeasured) confounding factors might influence the relationship "
-                f"between {treatment} and {outcome}? "
-                f"We have already considered the following factors: {variables}. "
-                f"Do not repeat them. List only confounding factors not already in that list."
-            )
             response = await self.client.chat.completions.create(
                 **self._api_kwargs,
                 response_model=LatentConfoundersResponse,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
+                messages=latent_confounders_messages(
+                    treatment, outcome, variables, self.context, expertise
+                ),
             )
             return response.confounding_factors
         else:
             candidates = [v for v in variables if v not in (treatment, outcome)]
-            user_content = (
-                f"From these factors: {candidates}\n\n"
-                f"Which, if any, directly cause both {treatment} and {outcome}? "
-                f"Think step by step. Only include factors with a high likelihood of "
-                f"confounding the relationship between {treatment} and {outcome}."
-            )
             response = await self.client.chat.completions.create(
                 **self._api_kwargs,
                 response_model=ConfoundingFactorsResponse,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
+                messages=confounders_messages(
+                    treatment, outcome, candidates, self.context, expertise
+                ),
             )
             return [f for f in response.confounding_factors if f in candidates]
 
@@ -164,25 +149,12 @@ class IdentificationMixin:
         variables: list[str],
         expertise: str | None,
     ) -> list[str]:
-        system = (
-            f"You are an expert in {expertise} studying {self.context}."
-            if expertise
-            else "You are a helpful assistant for causal reasoning."
-        )
         candidates = [v for v in variables if v not in (treatment, outcome)]
-        user_content = (
-            f"From these factors: {candidates}\n\n"
-            f"Which, if any, should see zero treatment effect when changing {treatment}? "
-            f"Which factors should be completely unaffected by changes in {treatment} "
-            f"and are unrelated to the causal mechanisms that affect {outcome}? "
-            f"Think step by step. Only include factors you are confident are negative controls."
-        )
         response = await self.client.chat.completions.create(
             **self._api_kwargs,
             response_model=NegativeControlsResponse,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_content},
-            ],
+            messages=negative_controls_messages(
+                treatment, outcome, candidates, self.context, expertise
+            ),
         )
         return [f for f in response.negative_controls if f in candidates]

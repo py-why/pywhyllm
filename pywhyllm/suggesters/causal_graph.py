@@ -155,12 +155,27 @@ class CausalGraph:
         """
         Return candidate instrumental variables for the treatment → outcome effect.
 
-        An IV is a parent of `treatment` that is not an ancestor of `outcome`
-        (i.e. its only path to `outcome` is through `treatment`).
+        An IV is a parent of ``treatment`` whose only path to ``outcome`` runs
+        *through* ``treatment`` — i.e. it cannot reach ``outcome`` if we block
+        the treatment node.
+
+        This is a stricter (and more correct) check than simply excluding all
+        ancestors of ``outcome``: a variable like E in ``E → treatment → outcome``
+        is a valid IV even though it is technically an ancestor of ``outcome``.
         """
-        return list(
-            set(self.parents_of(treatment)) - set(self.ancestors_of(outcome))
-        )
+        treatment_parents = set(self.parents_of(treatment))
+
+        # Find ancestors of outcome when treatment is removed from the graph
+        ancestors_without_treatment: set[str] = set()
+        queue = deque(self.parents_of(outcome))
+        while queue:
+            node = queue.popleft()
+            if node == treatment or node in ancestors_without_treatment:
+                continue
+            ancestors_without_treatment.add(node)
+            queue.extend(self.parents_of(node))
+
+        return list(treatment_parents - ancestors_without_treatment)
 
     # ------------------------------------------------------------------
     # Edge data and reasoning queries
