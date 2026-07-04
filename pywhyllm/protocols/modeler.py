@@ -1,57 +1,51 @@
-from typing import List, Protocol
+from typing import Protocol
+
 
 class ModelerProtocol(Protocol):
 
-    def suggest_pairwise_relationship(self, variable1: str, variable2: str):
+    async def suggest_graph(
+        self,
+        variables: list[str],
+        expertise_list: list[str] | None = None,
+    ):
         """
-        Suggest the relationships between variables.
+        Build a causal graph over `variables`.
 
-        Args:
-            variable1: str
-                A string name of variable1
+        Parameters
+        ----------
+        variables : list[str]
+            Variable names to reason over.
+        expertise_list : list[str] | None
+            Domain expert roles for consensus. None uses a generic persona.
 
-            variable2: str
-                A string name of variable2
-
-        Returns:
-            [variable1, variable2, description] if variable1 causes variable2
-            [variable2, variable1, description] if variable2 causes variable1
-            [None, None, description] if neither causes the other
+        Returns
+        -------
+        CausalGraph
         """
-        pass
+        ...
 
-
-    def suggest_variable_relationships(self, variables: List[str]):
+    async def suggest_confounders(
+        self,
+        treatment: str,
+        outcome: str,
+        variables: list[str],
+        expertise_list: list[str] | None = None,
+        latent: bool = False,
+    ) -> list[str]:
         """
-        Suggest the relationships between variables.
+        Suggest confounders of the treatment → outcome relationship.
 
-        Args:
-            variables: List[str]
-                A list of variable names
-
-            TODO: add a way to pass in longer variable descriptions
-        
-        Returns:
-            variable_relationships: Dict[[cause,effect],description] 
-            
-            TODO: update to return a NetworkX graph, with the description as metadata for each edge
-                
+        Parameters
+        ----------
+        latent : bool
+            False: search within variables. True: search outside variables.
         """
-        pass
+        ...
 
-    def suggest_confounders(self, variables: List[str], treatment: str, outcome: str):
-        """
-        Suggest confounders
-
-        Args:
-            variable_descriptions: Dict[str, str]
-                A dictionary mapping variable names to their descriptions.
-
-            variable_relationships: Dict[Tuple[str, str], str]
-                A dictionary where the keys are edges, where it's assumed that parent is first, child is second, and the values are an explanation for how their relationship occurs.
-
-        Returns:
-            confounders: Set[Tuple[str, str]]
-                Set of confounders along with a reasoning or explanation for how the confounding occurs.
-        """
-        pass
+    async def suggest_domain_experts(
+        self,
+        variables: list[str],
+        n_experts: int = 3,
+    ) -> list[str]:
+        """Suggest domain expert roles relevant to `variables`."""
+        ...

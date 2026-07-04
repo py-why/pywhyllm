@@ -1,5 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
+import pytest
+
+guidance = pytest.importorskip("guidance", reason="guidance not installed — skipping TuebingenModelSuggester tests")
 from guidance.models._openai import OpenAI
 
 from pywhyllm.suggesters.tuebingen_model_suggester import TuebingenModelSuggester, Strategy

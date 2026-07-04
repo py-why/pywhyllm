@@ -15,10 +15,9 @@ repository = "https://github.com/py-why/pywhy-llm"
 classifiers = [
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: MIT License',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
 ]
 keywords = [
     'large language model',
@@ -49,10 +48,9 @@ files = ["pywhyllm/__init__.py"]
 # Dependency compatibility notes:
 #
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
-# to support python 3.9 with networkx
-networkx = "<=3.2.1"
-guidance = ">=0.2"
+python = ">=3.11,<4.0"
+networkx = ">=3.3"
+instructor = ">=1.0.0"
 openai = ">=1.70"
 pydantic = ">=2.11"
 langchain = ">=0.3.25"
@@ -63,8 +61,11 @@ langchain-openai = "0.3.26"
 langchain-huggingface = ">=0.2.0"
 rank-bm25 = ">=0.2.2"
 sentence-transformers = ">=4.1.0"
-onnxruntime = "1.20.1"
 multidict = "^6.6.3"
+graphviz = { version = ">=0.20", optional = true }
+
+[tool.poetry.extras]
+viz = ["graphviz"]
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.33.0"
@@ -73,7 +74,7 @@ black = { version = "^25.1.0", extras = ["jupyter"] }
 isort = "^6.0.1"
 pytest = "^7.4.3"
 pytest-cov = "^6.0.0"
-pytest-split = "^0.10.0"
+pytest-split = { version = "^0.10.0", python = ">=3.11,<4.0" }
 nbformat = "^5.10.4"
 jupyter = "^1.1.1"
 mypy = "^1.15.0"
@@ -143,7 +144,7 @@ ignore_fail = "return_non_zero"
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py311']
 include = '\.pyi?$'
 extend-exclude = '''
 (
@@ -160,4 +161,4 @@ disable = ["W0511"]
 profile = 'black'
 multi_line_output = 3
 line_length = 120
-py_version = 38
+py_version = 311

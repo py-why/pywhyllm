@@ -25,10 +25,10 @@ pip install pywhyllm
 PyWhy-LLM seamlessly integrates into your existing causal inference process. Import the necessary classes and start exploring the power of LLM-augmented causal analysis.
 
 ```python
-from pywhyllm.suggesters.model_suggester import ModelSuggester 
+from pywhyllm.suggesters.model_suggester import ModelSuggester
 from pywhyllm.suggesters.identification_suggester import IdentificationSuggester
 from pywhyllm.suggesters.validation_suggester import ValidationSuggester
-from pywhyllm.suggesters.augmented_model_suggester import AugmentedModelSuggester
+from pywhyllm.suggesters.augmented_model_suggester_causenet import AugmentedModelSuggester
 from pywhyllm import RelationshipStrategy
 
 ```

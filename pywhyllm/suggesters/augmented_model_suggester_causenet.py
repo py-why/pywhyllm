@@ -6,7 +6,7 @@ from pywhyllm.utils.data_loader import download_causenet, load_causenet_json, cr
 from pywhyllm.utils.augmented_model_suggester_utils import *
 
 
-class AugmentedModelSuggester(SimpleModelSuggester):
+class AugmentedModelSuggesterCauseNet(SimpleModelSuggester):
     """
         A class that extends SimpleModelSuggester and currently provides methods for suggesting causal relationships between variables by leveraging the CauseNet dataset for Retrieval Augmented Generation (RAG).
 
@@ -15,17 +15,18 @@ class AugmentedModelSuggester(SimpleModelSuggester):
             Suggests the causal relationship between two variables and returns a list containing the cause, effect, and a description of the relationship.
         """
 
-    def __init__(self, llm, file_path: str = 'data/causenet-precision.jsonl.bz2'):
+    def __init__(self, model: str = "gpt-4", client=None, file_path: str = 'data/causenet-precision.jsonl.bz2'):
         """
         Initialize the AugmentedModelSuggester with a language model and download CauseNet data.
 
         Args:
-            llm: The language model instance to be used for querying.
+            model (str): The OpenAI model name to use. Defaults to 'gpt-4'.
+            client: An optional pre-configured instructor client. If None, a default client is created.
             file_path (str, optional): Path to save the downloaded CauseNet JSONL file.
                                       Defaults to 'data/causenet-precision.jsonl.bz2'.
         """
 
-        super().__init__(llm)
+        super().__init__(model, client)
         self.file_path = file_path
 
         logging.basicConfig(level=logging.INFO)
