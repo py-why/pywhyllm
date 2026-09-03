@@ -51,7 +51,10 @@ files = ["pywhyllm/__init__.py"]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 # to support python 3.9 with networkx
-networkx = "<=3.2.1"
+networkx = [
+  { version = "<=3.2.1", python = "<3.10" },
+  { version = ">=3.3,<4", python = ">=3.10" },
+]
 guidance = ">=0.2"
 openai = ">=1.70"
 pydantic = ">=2.11"
