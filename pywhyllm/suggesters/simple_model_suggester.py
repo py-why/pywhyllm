@@ -22,8 +22,12 @@ class SimpleModelSuggester:
 
     def __init__(self, llm=None):
         if llm is not None:
-            if (llm == 'gpt-4'):
+            if llm == 'gpt-4':
                 self.llm = guidance.models.OpenAI('gpt-4')
+            elif isinstance(llm, guidance.models.Model):
+                self.llm = llm
+            else:
+                raise ValueError("llm must be either 'gpt-4' or a guidance model instance.")
 
     # new ver
     def suggest_pairwise_relationship(self, variable1: str, variable2: str):
@@ -55,11 +59,11 @@ class SimpleModelSuggester:
         answer = [ans.strip() for ans in answer]
         answer_str = "".join(answer)
 
-        if (answer_str == "A"):
+        if answer_str == "A":
             return [variable1, variable2, description]
-        elif (answer_str == "B"):
+        elif answer_str == "B":
             return [variable2, variable1, description]
-        elif (answer_str == "C"):
+        elif answer_str == "C":
             return [None, None, description]  # maybe we want to save the description in this case too
         else:
             assert False, "Invalid answer from LLM: " + answer_str
