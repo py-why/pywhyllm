@@ -11,9 +11,14 @@ class IdentificationSuggester(IdentifierProtocol):
 
     def __init__(self, llm=None):
         if llm is not None:
-            if (llm == 'gpt-4'):
+            if llm == 'gpt-4':
                 self.llm = guidance.models.OpenAI('gpt-4')
                 self.model_suggester = ModelSuggester('gpt-4')
+            elif isinstance(llm, guidance.models.Model):
+                self.llm = llm
+                self.model_suggester = ModelSuggester(llm)
+            else:
+                raise ValueError("llm must be either 'gpt-4' or a guidance model instance.")
 
     # def suggest_estimand(
     #     self,
